@@ -260,6 +260,9 @@
                     , {{ Auth::user()->name }}
                 @endauth
             </h1>
+            <div class="alert alert-primary" role="alert">
+                img
+            </div>
         </section>
 
         <!-- Categories Section -->

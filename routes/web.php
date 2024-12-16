@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\DetailController;
 
 // Public Routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -18,6 +19,10 @@ Route::post('/login', [AuthController::class, 'authenticate']);
 Route::get('/register', [AuthController::class, 'register'])->name('register');
 Route::post('/register', [AuthController::class, 'store']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+
+// Page Detail
+Route::get('/details', [DetailController::class, 'show'])->name('product.show');
 
 // Protected Routes (require authentication)
 Route::middleware(['auth'])->group(function () {
