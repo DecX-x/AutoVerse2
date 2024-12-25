@@ -1,10 +1,10 @@
-<!-- home.blade.php -->
+.php
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AutoVerse - Home</title>
+    <title>{{ $product['name'] }} - AutoVerse</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -188,10 +188,50 @@
 [data-bs-theme="dark"] .badge.bg-danger {
     background-color: #ef4444 !important;
 }
+        /* Copy all styles from home.blade.php and add these new styles */
+        .product-image {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .thumbnail {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 4px;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+
+        .thumbnail:hover,
+        .thumbnail.active {
+            opacity: 1;
+            transform: scale(1.05);
+        }
+
+        .specs-table tr td:first-child {
+            width: 150px;
+            font-weight: 600;
+        }
+
+        .quantity-input {
+            width: 70px;
+            text-align: center;
+        }
+
+        .feature-item {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            background: var(--card-bg);
+            box-shadow: var(--box-shadow);
+        }
     </style>
 </head>
 <body>
-    <!-- Navbar -->
     <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container">
             <a class="navbar-brand" href="#">AutoVerse</a>
@@ -237,175 +277,97 @@
         </div>
     </nav>
 
-    <!-- Main Content -->
     <main class="container mt-5 pt-5">
-        <!-- Hero Section -->
-        <section class="py-5 text-center fade-in">
-            <h1 class="display-4 fw-bold mb-4">
-                <?php
-                    $hour = date('H');
-                    $greeting = '';
-                    if ($hour >= 5 && $hour < 12) {
-                        $greeting = 'Good Morning';
-                    } elseif ($hour >= 12 && $hour < 17) {
-                        $greeting = 'Good Afternoon';
-                    } elseif ($hour >= 17 && $hour < 22) {
-                        $greeting = 'Good Evening';
-                    } else {
-                        $greeting = 'Good Night';
-                    }
-                ?>
-                {{ $greeting }}
-                @auth
-                    , {{ Auth::user()->name }}
-                @endauth
-            </h1>
-            <div class="alert alert-primary" role="alert">
-                img
+        <div class="row g-4">
+            <!-- Product Images -->
+            <div class="col-md-6">
+                <div class="position-relative mb-3">
+                    <img src="{{ $product['images'][0] }}" id="mainImage" class="product-image" alt="{{ $product['name'] }}">
+                </div>
+                <div class="d-flex gap-2">
+                    @foreach($product['images'] as $index => $image)
+                    <img src="{{ $image }}" 
+                         class="thumbnail {{ $index === 0 ? 'active' : '' }}"
+                         onclick="changeImage(this.src)"
+                         alt="Product thumbnail">
+                    @endforeach
+                </div>
             </div>
-        </section>
 
-        <!-- Categories Section -->
-        <section class="py-5 fade-in">
-            <h2 class="text-center mb-4">Popular Categories</h2>
-            <div class="row g-4">
-                <div class="col-md-4">
-                    <div class="card">
-                        <div class="card-body text-center">
-                            <i class="fas fa-car fa-3x mb-3 text-primary"></i>
-                            <h5 class="card-title">Car Parts</h5>
+            <!-- Product Info -->
+            <div class="col-md-6">
+                <h1 class="mb-2">{{ $product['name'] }}</h1>
+                <div class="mb-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <div>
+                            @for($i = 1; $i <= 5; $i++)
+                                @if($i <= floor($product['rating']))
+                                    <i class="fas fa-star text-warning"></i>
+                                @elseif($i - 0.5 <= $product['rating'])
+                                    <i class="fas fa-star-half-alt text-warning"></i>
+                                @else
+                                    <i class="far fa-star text-warning"></i>
+                                @endif
+                            @endfor
                         </div>
+                        <span class="text-secondary">({{ $product['reviews_count'] }} reviews)</span>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="card">
-                        <div class="card-body text-center">
-                            <i class="fas fa-tools fa-3x mb-3 text-primary"></i>
-                            <h5 class="card-title">Tools</h5>
+
+                <h2 class="text-primary mb-3">Rp. {{ number_format($product['price'], 2) }}</h2>
+                
+                <p class="mb-4">{{ $product['description'] }}</p>
+
+                <div class="mb-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="input-group" style="width: 150px;">
+                            <button class="btn btn-outline-secondary" type="button" onclick="updateQuantity(-1)">-</button>
+                            <input type="number" class="form-control quantity-input" id="quantity" value="1" min="1" max="{{ $product['stock'] }}">
+                            <button class="btn btn-outline-secondary" type="button" onclick="updateQuantity(1)">+</button>
                         </div>
+                        <button class="btn btn-primary">
+                            <i class="fas fa-cart-plus me-2"></i>Add to Cart
+                        </button>
                     </div>
+                    <small class="text-secondary mt-2 d-block">{{ $product['stock'] }} items in stock</small>
                 </div>
-                <div class="col-md-4">
-                    <div class="card">
-                        <div class="card-body text-center">
-                            <i class="fas fa-oil-can fa-3x mb-3 text-primary"></i>
-                            <h5 class="card-title">Accessories</h5>
+
+                <!-- Features -->
+                <div class="mb-4">
+                    <h3 class="h5 mb-3">Key Features</h3>
+                    <div class="row g-2">
+                        @foreach($product['features'] as $feature)
+                        <div class="col-md-6">
+                            <div class="feature-item">
+                                <i class="fas fa-check text-primary me-2"></i>
+                                {{ $feature }}
+                            </div>
                         </div>
+                        @endforeach
                     </div>
                 </div>
-            </div>
-        </section>
-        <!-- Add this section after the Categories Section -->
-<section class="py-5 fade-in">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Featured Products</h2>
-        <a href="#" class="btn btn-outline-primary">View All</a>
-    </div>
-    <div class="row g-4">
-        <!-- Product Card 1 -->
-        <div class="col-md-3">
-            <div class="card h-100">
-                <div class="position-relative">
-                    <img src="https://placehold.co/400x300" class="card-img-top" alt="Product Image">
-                    <span class="position-absolute top-0 end-0 m-2 badge bg-primary">New</span>
-                </div>
-                <div class="card-body">
-                    <h5 class="card-title mb-1">Premium Brake Pads</h5>
-                    <div class="mb-2">
-                        <i class="fas fa-star text-warning"></i>
-                        <i class="fas fa-star text-warning"></i>
-                        <i class="fas fa-star text-warning"></i>
-                        <i class="fas fa-star text-warning"></i>
-                        <i class="fas fa-star-half-alt text-warning"></i>
-                        <small class="text-secondary ms-1">(24 reviews)</small>
-                    </div>
-                    <p class="text-primary fw-bold mb-1">Rp. 1.800.000</p>
-                    <p class="small text-secondary mb-2">Free shipping</p>
-                    <!-- Update the button in each product card to: -->
-                    <a href="{{ route('products.show', 1) }}" class="btn btn-primary w-100">
-                        <i class="fas fa-eye me-2"></i>View Details
-                    </a>
-                </div>
-            </div>
-        </div>
 
-        <!-- Product Card 2 -->
-        <div class="col-md-3">
-            <div class="card h-100">
-                <img src="https://placehold.co/400x300" class="card-img-top" alt="Product Image">
-                <div class="card-body">
-                    <h5 class="card-title mb-1">LED Headlight Kit</h5>
-                    <div class="mb-2">
-                        <i class="fas fa-star text-warning"></i>
-                        <i class="fas fa-star text-warning"></i>
-                        <i class="fas fa-star text-warning"></i>
-                        <i class="fas fa-star text-warning"></i>
-                        <i class="fas fa-star text-warning"></i>
-                        <small class="text-secondary ms-1">(156 reviews)</small>
-                    </div>
-                    <p class="text-primary fw-bold mb-1">Rp. 2.400.000</p>
-                    <p class="small text-secondary mb-2">Free shipping</p>
-                    <a href="{{ route('products.show', 1) }}" class="btn btn-primary w-100">
-                        <i class="fas fa-eye me-2"></i>View Details
-                    </a>
+                <!-- Specifications -->
+                <div>
+                    <h3 class="h5 mb-3">Specifications</h3>
+                    <table class="table specs-table">
+                        <tbody>
+                            @foreach($product['specifications'] as $key => $value)
+                            <tr>
+                                <td>{{ $key }}</td>
+                                <td>{{ $value }}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
-
-        <!-- Product Card 3 -->
-        <div class="col-md-3">
-            <div class="card h-100">
-                <div class="position-relative">
-                    <img src="https://placehold.co/400x300" class="card-img-top" alt="Product Image">
-                    <span class="position-absolute top-0 end-0 m-2 badge bg-danger">Sale</span>
-                </div>
-                <div class="card-body">
-                    <h5 class="card-title mb-1">Performance Air Filter</h5>
-                    <div class="mb-2">
-                        <i class="fas fa-star text-warning"></i>
-                        <i class="fas fa-star text-warning"></i>
-                        <i class="fas fa-star text-warning"></i>
-                        <i class="fas fa-star text-warning"></i>
-                        <i class="fas fa-star text-secondary"></i>
-                        <small class="text-secondary ms-1">(42 reviews)</small>
-                    </div>
-                    <p class="text-primary fw-bold mb-1">Rp. 750.000</p>
-                    <p class="small text-secondary mb-2">+ $5.99 shipping</p>
-                    <a href="{{ route('products.show', 1) }}" class="btn btn-primary w-100">
-                        <i class="fas fa-eye me-2"></i>View Details
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Product Card 4 -->
-        <div class="col-md-3">
-            <div class="card h-100">
-                <img src="https://placehold.co/400x300" class="card-img-top" alt="Product Image">
-                <div class="card-body">
-                    <h5 class="card-title mb-1">Professional Tool Set</h5>
-                    <div class="mb-2">
-                        <i class="fas fa-star text-warning"></i>
-                        <i class="fas fa-star text-warning"></i>
-                        <i class="fas fa-star text-warning"></i>
-                        <i class="fas fa-star text-warning"></i>
-                        <i class="fas fa-star-half-alt text-warning"></i>
-                        <small class="text-secondary ms-1">(89 reviews)</small>
-                    </div>
-                    <p class="text-primary fw-bold mb-1">Rp. 4.250.000</p>
-                    <p class="small text-secondary mb-2">Free shipping</p>
-                    <a href="{{ route('products.show', 1) }}" class="btn btn-primary w-100">
-                        <i class="fas fa-eye me-2"></i>View Details
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Copy theme toggle script from home.blade.php
         document.addEventListener('DOMContentLoaded', () => {
             const themeToggle = document.getElementById('theme-toggle');
             const html = document.documentElement;
@@ -428,6 +390,22 @@
                 icon.className = theme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
             }
         });
+
+        function changeImage(src) {
+            document.getElementById('mainImage').src = src;
+            document.querySelectorAll('.thumbnail').forEach(thumb => {
+                thumb.classList.remove('active');
+                if(thumb.src === src) thumb.classList.add('active');
+            });
+        }
+
+        function updateQuantity(change) {
+            const input = document.getElementById('quantity');
+            const newValue = parseInt(input.value) + change;
+            if(newValue >= 1 && newValue <= {{ $product['stock'] }}) {
+                input.value = newValue;
+            }
+        }
     </script>
 </body>
 </html>

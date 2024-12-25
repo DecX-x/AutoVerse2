@@ -22,8 +22,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 
 // Page Detail
-Route::get('/details', [DetailController::class, 'show'])->name('product.show');
-
+Route::get('/products/{id}', [ProductController::class, 'show'])->name('products.show');
 // Protected Routes (require authentication)
 Route::middleware(['auth'])->group(function () {
     Route::get('/cart', [CartController::class, 'index'])->name('cart');
