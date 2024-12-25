@@ -242,7 +242,7 @@
         <!-- Hero Section -->
         <section class="py-5 text-center fade-in">
             <h1 class="display-4 fw-bold mb-4">
-                <?php
+                @php
                     $hour = date('H');
                     $greeting = '';
                     if ($hour >= 5 && $hour < 12) {
@@ -254,7 +254,7 @@
                     } else {
                         $greeting = 'Good Night';
                     }
-                ?>
+                @endphp
                 {{ $greeting }}
                 @auth
                     , {{ Auth::user()->name }}
