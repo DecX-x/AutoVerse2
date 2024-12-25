@@ -1,38 +1,32 @@
 <?php
-// app/Models/Product.php
 
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Product extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
         'name',
-        'description',
+        'category',
         'price',
+        'rating',
+        'reviews_count',
+        'description',
+        'badge',
+        'badge_color',
+        'free_shipping',
         'image',
-        'category_id',
         'stock',
-        'featured',
-        'sku'
+        'features',
+        'specifications'
     ];
 
-    public function category()
-    {
-        return $this->belongsTo(Category::class);
-    }
-
-    public function carts()
-    {
-        return $this->belongsToMany(Cart::class)->withPivot('quantity');
-    }
-
-    public function orders()
-    {
-        return $this->belongsToMany(Order::class)->withPivot(['quantity', 'price']);
-    }
+    protected $casts = [
+        'price' => 'decimal:2',
+        'rating' => 'float',
+        'free_shipping' => 'boolean',
+        'features' => 'array',
+        'specifications' => 'array'
+    ];
 }

@@ -188,18 +188,89 @@
 [data-bs-theme="dark"] .badge.bg-danger {
     background-color: #ef4444 !important;
 }
+@media (max-width: 991.98px) {
+        .navbar-collapse {
+            background: var(--nav-bg);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 0.5rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        .navbar .container {
+            padding: 0.5rem 1rem;
+        }
+
+        .navbar-toggler {
+            padding: 4px 8px;
+            font-size: 1rem;
+        }
+
+        .search-input {
+            font-size: 0.9rem !important;
+            padding: 8px 16px !important;
+        }
+    }
+
+    .navbar-nav .nav-link {
+        padding: 0.5rem 1rem;
+        border-radius: 0.25rem;
+    }
+
+    .navbar-nav .nav-link:hover {
+        background: rgba(var(--bs-primary-rgb), 0.1);
+    }
+    @media (min-width: 992px) {
+        .navbar .container {
+            padding-left: 0;
+            max-width: 95%;
+            margin-left: 2rem;
+        }
+        
+        .navbar-brand {
+            margin-right: 3rem;
+        }
+        
+        .navbar-nav {
+            margin-left: -1rem;
+        }
+    }
+
     </style>
 </head>
 <body>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="#">AutoVerse</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <!-- Brand -->
+            <a class="navbar-brand" href="/">AutoVerse</a>
+    
+            <!-- Mobile Menu Button -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
+    
+            <!-- Navbar Content -->
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <!-- Search Form - Full Width on Mobile -->
+                <form class="d-lg-none w-100 my-3 ">
+                    <input 
+                        class="form-control search-input" 
+                        type="search" 
+                        placeholder="Search products..."
+                        style="
+                            border-radius: 10px;
+                            padding: 10px 15px;
+                            font-size: 0.95rem;
+                            background: var(--input-bg);
+                            border: 1px solid var(--input-border);
+                            color: var(--text-color);
+                        "
+                    >
+                </form>
+    
+                <!-- Navigation Links -->
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
                         <a class="nav-link active" href="/">Home</a>
                     </li>
@@ -213,30 +284,51 @@
                         <a class="nav-link" href="#">Auction💰</a>
                     </li>
                 </ul>
-                <div class="d-flex align-items-center gap-3">
+    
+                <!-- Desktop Search -->
+                <form class="d-none d-lg-flex mx-auto" style="width: 35%;">
+                    <input 
+                        class="form-control search-input" 
+                        type="search" 
+                        placeholder="Search for parts, tools, accessories..."
+                        style="
+                            border-radius: 30px;
+                            padding: 10px 20px;
+                            font-size: 0.95rem;
+                            transition: all 0.3s ease;
+                            box-shadow: var(--box-shadow);
+                            background: var(--input-bg);
+                            border: 1px solid var(--input-border);
+                            color: var(--text-color);
+                            width: 100%;
+                        "
+                    >
+                </form>
+    
+                <!-- Action Buttons -->
+                <div class="d-flex align-items-center gap-2 mt-3 mt-lg-0">
                     <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
                         <i class="fas fa-sun"></i>
                     </button>
-                    <a href="#" class="btn btn-outline-primary">
-                        <i class="fas fa-shopping-cart me-2"></i>Cart
+                    <a href="#" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-shopping-cart me-2"></i><span class="d-none d-lg-inline">Cart</span>
                     </a>
                     @auth
                         <form action="{{ route('logout') }}" method="POST" class="d-inline">
                             @csrf
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-sign-out-alt me-2"></i>Logout
+                            <button type="submit" class="btn btn-primary btn-sm">
+                                <i class="fas fa-sign-out-alt me-2"></i><span class="d-none d-lg-inline">Logout</span>
                             </button>
                         </form>
                     @else
-                        <a href="{{ route('login') }}" class="btn btn-primary">
-                            <i class="fas fa-sign-in-alt me-2"></i>Login
+                        <a href="{{ route('login') }}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-sign-in-alt me-2"></i><span class="d-none d-lg-inline">Login</span>
                         </a>
                     @endauth
                 </div>
             </div>
         </div>
     </nav>
-
     <!-- Main Content -->
     <main class="container mt-5 pt-5">
         <!-- Hero Section -->
@@ -271,27 +363,37 @@
             <div class="row g-4">
                 <div class="col-md-4">
                     <div class="card">
-                        <div class="card-body text-center">
-                            <i class="fas fa-car fa-3x mb-3 text-primary"></i>
-                            <h5 class="card-title">Car Parts</h5>
-                        </div>
+                        <a href="/products?categories%5B%5D=Engine+Parts" class="text-decoration-none">
+                            <div class="card-body text-center">
+                                <i class="fas fa-gear fa-3x mb-3 text-primary"></i>
+                                <h5 class="card-title">Engine Parts</h5>
+                            </div>
+                        </a>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="card">
-                        <div class="card-body text-center">
-                            <i class="fas fa-tools fa-3x mb-3 text-primary"></i>
-                            <h5 class="card-title">Tools</h5>
-                        </div>
+                        <a href="/products?categories%5B%5D=Tools" class="text-decoration-none">
+                            <div class="card-body text-center">
+                                <i class="fas fa-tools fa-3x mb-3 text-primary"></i>
+                                <h5 class="card-title">Tools</h5>
+                            </div>
+                        </a>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="card">
-                        <div class="card-body text-center">
-                            <i class="fas fa-oil-can fa-3x mb-3 text-primary"></i>
-                            <h5 class="card-title">Accessories</h5>
-                        </div>
+                        <a href="/products?categories%5B%5D=Accessories" class="text-decoration-none">
+                            <div class="card-body text-center">
+                                <i class="fas fa-oil-can fa-3x mb-3 text-primary"></i>
+                                <h5 class="card-title">Accessories</h5>
+                            </div>
+                        </a>
                     </div>
+                </div>
+                <!-- button in the middle -->
+                <div class="col-md-12 text-center mt-4">
+                    <a href="/products" class="btn btn-primary btn-lg">View All Categories</a>
                 </div>
             </div>
         </section>
@@ -302,104 +404,42 @@
         <a href="/products" class="btn btn-outline-primary">View All</a>
     </div>
     <div class="row g-4">
-        <!-- Product Card 1 -->
-        <div class="col-md-3">
-            <div class="card h-100">
-                <div class="position-relative">
-                    <img src="https://placehold.co/400x300" class="card-img-top" alt="Product Image">
-                    <span class="position-absolute top-0 end-0 m-2 badge bg-primary">New</span>
-                </div>
-                <div class="card-body">
-                    <h5 class="card-title mb-1">Premium Brake Pads</h5>
-                    <div class="mb-2">
+@foreach($featured_products as $product)
+<div class="col-md-3">
+    <div class="card h-100">
+        <div class="position-relative">
+            <img src="{{ $product->image }}" class="card-img-top" alt="{{ $product->name }}">
+            @if($product->badge)
+            <span class="position-absolute top-0 end-0 m-2 badge bg-{{ $product->badge_color }}">
+                {{ $product->badge }}
+            </span>
+            @endif
+        </div>
+        <div class="card-body">
+            <h5 class="card-title mb-1">{{ $product->name }}</h5>
+            <div class="mb-2">
+                @for($i = 1; $i <= 5; $i++)
+                    @if($i <= floor($product->rating))
                         <i class="fas fa-star text-warning"></i>
-                        <i class="fas fa-star text-warning"></i>
-                        <i class="fas fa-star text-warning"></i>
-                        <i class="fas fa-star text-warning"></i>
+                    @elseif($i - 0.5 <= $product->rating)
                         <i class="fas fa-star-half-alt text-warning"></i>
-                        <small class="text-secondary ms-1">(24 reviews)</small>
-                    </div>
-                    <p class="text-primary fw-bold mb-1">Rp. 1.800.000</p>
-                    <p class="small text-secondary mb-2">Free shipping</p>
-                    <!-- Update the button in each product card to: -->
-                    <a href="{{ route('products.show', 1) }}" class="btn btn-primary w-100">
-                        <i class="fas fa-eye me-2"></i>View Details
-                    </a>
-                </div>
+                    @else
+                        <i class="far fa-star text-warning"></i>
+                    @endif
+                @endfor
+                <small class="text-secondary ms-1">({{ $product->reviews_count }} reviews)</small>
             </div>
+            <p class="text-primary fw-bold mb-1">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
+            <p class="small text-secondary mb-2">
+                {{ $product->free_shipping ? 'Free shipping' : '+ Shipping fee' }}
+            </p>
+            <a href="{{ route('products.show', $product->id) }}" class="btn btn-primary w-100">
+                <i class="fas fa-eye me-2"></i>View Details
+            </a>
         </div>
-
-        <!-- Product Card 2 -->
-        <div class="col-md-3">
-            <div class="card h-100">
-                <img src="https://placehold.co/400x300" class="card-img-top" alt="Product Image">
-                <div class="card-body">
-                    <h5 class="card-title mb-1">LED Headlight Kit</h5>
-                    <div class="mb-2">
-                        <i class="fas fa-star text-warning"></i>
-                        <i class="fas fa-star text-warning"></i>
-                        <i class="fas fa-star text-warning"></i>
-                        <i class="fas fa-star text-warning"></i>
-                        <i class="fas fa-star text-warning"></i>
-                        <small class="text-secondary ms-1">(156 reviews)</small>
-                    </div>
-                    <p class="text-primary fw-bold mb-1">Rp. 2.400.000</p>
-                    <p class="small text-secondary mb-2">Free shipping</p>
-                    <a href="{{ route('products.show', 1) }}" class="btn btn-primary w-100">
-                        <i class="fas fa-eye me-2"></i>View Details
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Product Card 3 -->
-        <div class="col-md-3">
-            <div class="card h-100">
-                <div class="position-relative">
-                    <img src="https://placehold.co/400x300" class="card-img-top" alt="Product Image">
-                    <span class="position-absolute top-0 end-0 m-2 badge bg-danger">Sale</span>
-                </div>
-                <div class="card-body">
-                    <h5 class="card-title mb-1">Performance Air Filter</h5>
-                    <div class="mb-2">
-                        <i class="fas fa-star text-warning"></i>
-                        <i class="fas fa-star text-warning"></i>
-                        <i class="fas fa-star text-warning"></i>
-                        <i class="fas fa-star text-warning"></i>
-                        <i class="fas fa-star text-secondary"></i>
-                        <small class="text-secondary ms-1">(42 reviews)</small>
-                    </div>
-                    <p class="text-primary fw-bold mb-1">Rp. 750.000</p>
-                    <p class="small text-secondary mb-2">+ $5.99 shipping</p>
-                    <a href="{{ route('products.show', 1) }}" class="btn btn-primary w-100">
-                        <i class="fas fa-eye me-2"></i>View Details
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Product Card 4 -->
-        <div class="col-md-3">
-            <div class="card h-100">
-                <img src="https://placehold.co/400x300" class="card-img-top" alt="Product Image">
-                <div class="card-body">
-                    <h5 class="card-title mb-1">Professional Tool Set</h5>
-                    <div class="mb-2">
-                        <i class="fas fa-star text-warning"></i>
-                        <i class="fas fa-star text-warning"></i>
-                        <i class="fas fa-star text-warning"></i>
-                        <i class="fas fa-star text-warning"></i>
-                        <i class="fas fa-star-half-alt text-warning"></i>
-                        <small class="text-secondary ms-1">(89 reviews)</small>
-                    </div>
-                    <p class="text-primary fw-bold mb-1">Rp. 4.250.000</p>
-                    <p class="small text-secondary mb-2">Free shipping</p>
-                    <a href="{{ route('products.show', 1) }}" class="btn btn-primary w-100">
-                        <i class="fas fa-eye me-2"></i>View Details
-                    </a>
-                </div>
-            </div>
-        </div>
+    </div>
+</div>
+@endforeach
     </div>
 </section>
     </main>
