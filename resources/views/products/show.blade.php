@@ -346,17 +346,18 @@
                         @endforeach
                     </div>
                 </div>
-
                 <!-- Specifications -->
                 <div>
                     <h3 class="h5 mb-3">Specifications</h3>
                     <table class="table specs-table">
                         <tbody>
                             @foreach($product['specifications'] as $key => $value)
-                            <tr>
-                                <td>{{ $key }}</td>
-                                <td>{{ $value }}</td>
-                            </tr>
+                                @if(!empty($value))
+                                <tr>
+                                    <td>{{ $key }}</td>
+                                    <td>{{ $value }}</td>
+                                </tr>
+                                @endif
                             @endforeach
                         </tbody>
                     </table>

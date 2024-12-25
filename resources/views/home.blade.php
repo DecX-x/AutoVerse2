@@ -201,10 +201,10 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link active" href="#">Home</a>
+                        <a class="nav-link active" href="/">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Products</a>
+                        <a class="nav-link" href="/products">Products</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">Categories</a>
@@ -299,7 +299,7 @@
 <section class="py-5 fade-in">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Featured Products</h2>
-        <a href="#" class="btn btn-outline-primary">View All</a>
+        <a href="/products" class="btn btn-outline-primary">View All</a>
     </div>
     <div class="row g-4">
         <!-- Product Card 1 -->
