@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class AuthController extends Controller
 {
@@ -14,16 +15,11 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
-    public function register()
-    {
-        return view('auth.register');
-    }
-
     public function authenticate(Request $request)
     {
         $credentials = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required'
+            'email' => ['required', 'email'],
+            'password' => ['required'],
         ]);
 
         if (Auth::attempt($credentials)) {
@@ -32,30 +28,31 @@ class AuthController extends Controller
         }
 
         return back()->withErrors([
-            'email' => 'The provided credentials do not match our records.',
+            'email' => 'Invalid credentials.',
         ]);
+    }
+
+    public function register()
+    {
+        return view('auth.register');
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|min:8|confirmed',
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
         ]);
 
-        User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
         ]);
 
-        return redirect()->route('login')->with('success', 'Registration successful! Please login.');
-    }
-
-    public function home()
-    {
-        return view('home');
+        Auth::login($user);
+        return redirect('/');
     }
 
     public function logout(Request $request)
@@ -65,4 +62,61 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
         return redirect('/');
     }
+
+    
+    public function profile()
+    {
+        return view('profile');
+    }
+    
+    public function updateProfile(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+    
+        $user = Auth::user();
+        $user->name = $request->name;
+        $user->save();
+    
+        return back()->with('success', 'Profile updated successfully');
+    }
+    
+    public function updateProfilePhoto(Request $request)
+    {
+        $request->validate([
+            'profile_image' => 'required|image|mimes:jpeg,png,jpg|max:2048'
+        ]);
+    
+        if ($request->hasFile('profile_image')) {
+            $user = Auth::user();
+            
+            // Delete old image if exists
+            if ($user->profile_image) {
+                Storage::disk('public')->delete($user->profile_image);
+            }
+            
+            $path = $request->file('profile_image')->store('profile-photos', 'public');
+            $user->profile_image = $path;
+            $user->save();
+        }
+    
+        return back()->with('success', 'Profile photo updated successfully');
+    }
+    
+    public function updateAddress(Request $request)
+    {
+        $request->validate([
+            'address' => 'required|string|max:500'
+        ]);
+    
+        $user = Auth::user();
+        $user->address = $request->address;
+        $user->save();
+    
+        return back()->with('success', 'Address updated successfully');
+    }
+
+    
+    
 }

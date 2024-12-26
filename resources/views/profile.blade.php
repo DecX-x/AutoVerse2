@@ -1,13 +1,15 @@
-
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $product['name'] }} - AutoVerse</title>
+    <title>Profile - {{ Auth::user()->name }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Copy existing styles from home.blade.php -->
     <style>
+        /* Copy all styles from home.blade.php */
+        /* Additional profile styles */
         :root {
             --primary-color: #2563eb;
             --primary-dark: #1d4ed8;
@@ -188,48 +190,7 @@
 [data-bs-theme="dark"] .badge.bg-danger {
     background-color: #ef4444 !important;
 }
-        /* Copy all styles from home.blade.php and add these new styles */
-        .product-image {
-            width: 100%;
-            height: 400px;
-            object-fit: cover;
-            border-radius: 8px;
-        }
-
-        .thumbnail {
-            width: 80px;
-            height: 80px;
-            object-fit: cover;
-            border-radius: 4px;
-            cursor: pointer;
-            opacity: 0.7;
-            transition: all 0.3s ease;
-        }
-
-        .thumbnail:hover,
-        .thumbnail.active {
-            opacity: 1;
-            transform: scale(1.05);
-        }
-
-        .specs-table tr td:first-child {
-            width: 150px;
-            font-weight: 600;
-        }
-
-        .quantity-input {
-            width: 70px;
-            text-align: center;
-        }
-
-        .feature-item {
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            background: var(--card-bg);
-            box-shadow: var(--box-shadow);
-        }
-        @media (max-width: 991.98px) {
+@media (max-width: 991.98px) {
         .navbar-collapse {
             background: var(--nav-bg);
             padding: 1rem;
@@ -276,10 +237,33 @@
             margin-left: -1rem;
         }
     }
+        .profile-header {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        .profile-image {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--primary-color);
+        }
+
+        .profile-section {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--box-shadow);
+        }
     </style>
 </head>
 <body>
-    <!-- Navbar -->
+    <!-- Copy navbar from home.blade.php -->
     <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container">
             <!-- Brand -->
@@ -358,9 +342,6 @@
                         <i class="fas fa-shopping-cart me-2"></i><span class="d-none d-lg-inline">Cart</span>
                     </a>
                     @auth
-                        <a href="{{ route('profile') }}" class="btn btn-primary btn-sm">
-                            <i class="fas fa-user me-2"></i><span class="d-none d-lg-inline">Profile</span>
-                        </a>
                         <form action="{{ route('logout') }}" method="POST" class="d-inline">
                             @csrf
                             <button type="submit" class="btn btn-primary btn-sm">
@@ -376,101 +357,99 @@
             </div>
         </div>
     </nav>
-
-
-    <main class="container mt-5 pt-5">
-        <div class="row g-4">
-            <!-- Product Images -->
-<div class="col-md-6">
-    <div class="position-relative mb-3">
-        <img src="{{ $product->images[0] }}" id="mainImage" class="product-image" alt="{{ $product->name }}">
-    </div>
-    <div class="d-flex gap-2">
-        @foreach($product->images as $index => $image)
-        <img src="{{ $image }}" 
-             class="thumbnail {{ $index === 0 ? 'active' : '' }}"
-             onclick="changeImage(this.src)"
-             alt="Product thumbnail">
-        @endforeach
-    </div>
-</div>
-
-<!-- Product Info -->
-<div class="col-md-6">
-    <h1 class="mb-2">{{ $product->name }}</h1>
-    <div class="mb-3">
-        <div class="d-flex align-items-center gap-2">
-            <div>
-                @for($i = 1; $i <= 5; $i++)
-                    @if($i <= floor($product->rating))
-                        <i class="fas fa-star text-warning"></i>
-                    @elseif($i - 0.5 <= $product->rating)
-                        <i class="fas fa-star-half-alt text-warning"></i>
-                    @else
-                        <i class="far fa-star text-warning"></i>
-                    @endif
-                @endfor
-            </div>
-            <span class="text-secondary">({{ $product->reviews_count }} reviews)</span>
-        </div>
-    </div>
-
-    <h2 class="text-primary mb-3">{{ $product->formatted_price }}</h2>
     
-    <p class="mb-4">{{ $product->description }}</p>
-
-    <div class="mb-4">
-        <div class="d-flex align-items-center gap-3">
-            <div class="input-group" style="width: 150px;">
-                <button class="btn btn-outline-secondary" type="button" onclick="updateQuantity(-1)">-</button>
-                <input type="number" class="form-control quantity-input" id="quantity" value="1" min="1" max="{{ $product->stock }}">
-                <button class="btn btn-outline-secondary" type="button" onclick="updateQuantity(1)">+</button>
-            </div>
-            <button class="btn btn-primary">
-                <i class="fas fa-cart-plus me-2"></i>Add to Cart
-            </button>
-        </div>
-        <small class="text-secondary mt-2 d-block">{{ $product->stock }} items in stock</small>
-    </div>
-
-    <!-- Features -->
-    <div class="mb-4">
-        <h3 class="h5 mb-3">Key Features</h3>
-        <div class="row g-2">
-            @foreach($product->features as $feature)
-            <div class="col-md-6">
-                <div class="feature-item">
-                    <i class="fas fa-check text-primary me-2"></i>
-                    {{ $feature }}
+    <main class="container mt-5 pt-5">
+        <div class="profile-header">
+            <div class="row align-items-center">
+                <div class="col-md-3 text-center">
+                    <img 
+                        src="{{ Auth::user()->profile_image ? asset('storage/' . Auth::user()->profile_image) : asset('images/default-profile.png') }}" 
+                        class="profile-image mb-3"
+                        alt="Profile Picture"
+                    >
+                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#updatePhotoModal">
+                        <i class="fas fa-camera me-2"></i>Update Photo
+                    </button>
+                </div>
+                <div class="col-md-9">
+                    <h2 class="mb-3">{{ Auth::user()->name }}</h2>
+                    <p class="text-muted mb-2">
+                        <i class="fas fa-envelope me-2"></i>{{ Auth::user()->email }}
+                    </p>
+                    <p class="text-muted mb-3">
+                        <i class="fas fa-map-marker-alt me-2"></i>
+                        {{ Auth::user()->address ?: 'No address added yet' }}
+                    </p>
+                    <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                        <i class="fas fa-edit me-2"></i>Edit Profile
+                    </button>
+                    <a href="#" class="btn btn-success ms-2">
+                        <i class="fas fa-store me-2"></i>Become a Seller
+                    </a>
                 </div>
             </div>
-            @endforeach
         </div>
-    </div>
 
-    <!-- Specifications -->
-    <div>
-        <h3 class="h5 mb-3">Specifications</h3>
-        <table class="table specs-table">
-            <tbody>
-                @foreach($product->specifications as $key => $value)
-                    @if(!empty($value))
-                    <tr>
-                        <td>{{ $key }}</td>
-                        <td>{{ $value }}</td>
-                    </tr>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="profile-section">
+                    <h5 class="mb-3">Quick Links</h5>
+                    <div class="list-group">
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <i class="fas fa-shopping-bag me-2"></i>My Orders
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <i class="fas fa-heart me-2"></i>Wishlist
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <i class="fas fa-map-marker-alt me-2"></i>Addresses
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <i class="fas fa-cog me-2"></i>Settings
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-9">
+                <div class="profile-section">
+                    <h5 class="mb-4">Recent Orders</h5>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>No recent orders found
+                    </div>
+                </div>
+                
+                <div class="profile-section">
+                    <h5 class="mb-4">Saved Addresses</h5>
+                    @if(Auth::user()->address)
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h6 class="card-title">Primary Address</h6>
+                                <p class="card-text">{{ Auth::user()->address }}</p>
+                            </div>
+                        </div>
+                    @else
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>No addresses saved yet
+                        </div>
                     @endif
-                @endforeach
-            </tbody>
-        </table>
-    </div>
-</div>
+                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addAddressModal">
+                        <i class="fas fa-plus me-2"></i>Add New Address
+                    </button>
+                </div>
+            </div>
         </div>
     </main>
 
+    <!-- Modals -->
+    @include('partials.update-photo-modal')
+    @include('partials.edit-profile-modal')
+    @include('partials.add-address-modal')
+
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Copy theme toggle script from home.blade.php
+    <!-- Copy theme toggle script from home.blade.php -->
+   <script>
         document.addEventListener('DOMContentLoaded', () => {
             const themeToggle = document.getElementById('theme-toggle');
             const html = document.documentElement;
@@ -493,22 +472,7 @@
                 icon.className = theme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
             }
         });
-
-        function changeImage(src) {
-            document.getElementById('mainImage').src = src;
-            document.querySelectorAll('.thumbnail').forEach(thumb => {
-                thumb.classList.remove('active');
-                if(thumb.src === src) thumb.classList.add('active');
-            });
-        }
-
-        function updateQuantity(change) {
-            const input = document.getElementById('quantity');
-            const newValue = parseInt(input.value) + change;
-            if(newValue >= 1 && newValue <= {{ $product['stock'] }}) {
-                input.value = newValue;
-            }
-        }
     </script>
+    
 </body>
 </html>

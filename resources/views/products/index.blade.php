@@ -382,6 +382,9 @@
                         <i class="fas fa-shopping-cart me-2"></i><span class="d-none d-lg-inline">Cart</span>
                     </a>
                     @auth
+                        <a href="{{ route('profile') }}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-user me-2"></i><span class="d-none d-lg-inline">Profile</span>
+                        </a>
                         <form action="{{ route('logout') }}" method="POST" class="d-inline">
                             @csrf
                             <button type="submit" class="btn btn-primary btn-sm">

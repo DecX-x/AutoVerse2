@@ -21,6 +21,13 @@ Route::post('/login', [AuthController::class, 'authenticate']);
 Route::get('/register', [AuthController::class, 'register'])->name('register');
 Route::post('/register', [AuthController::class, 'store']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::middleware(['auth'])->group(function () {
+    // ...existing routes...
+    Route::get('/profile', [AuthController::class, 'profile'])->name('profile');
+    Route::put('/profile/update', [AuthController::class, 'updateProfile'])->name('profile.update');
+    Route::put('/profile/photo', [AuthController::class, 'updateProfilePhoto'])->name('profile.update.photo');
+    Route::put('/profile/address', [AuthController::class, 'updateAddress'])->name('profile.update.address');
+});
 
 
 // Page Detail

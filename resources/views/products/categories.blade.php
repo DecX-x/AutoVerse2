@@ -317,6 +317,9 @@
                         <i class="fas fa-shopping-cart me-2"></i><span class="d-none d-lg-inline">Cart</span>
                     </a>
                     @auth
+                        <a href="{{ route('profile') }}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-user me-2"></i><span class="d-none d-lg-inline">Profile</span>
+                        </a>
                         <form action="{{ route('logout') }}" method="POST" class="d-inline">
                             @csrf
                             <button type="submit" class="btn btn-primary btn-sm">
@@ -372,7 +375,7 @@
                     <div class="card">
                         <a href="/products?categories%5B%5D=Wheels" class="text-decoration-none">
                             <div class="card-body text-center">
-                                <i class="fas fa-wheel fa-3x mb-3 text-primary"></i>
+                                <i class="fas fa-futbol fa-3x mb-3 text-primary"></i>
                                 <h5 class="card-title">Wheels</h5>
                             </div>
                         </a>
@@ -382,7 +385,7 @@
                     <div class="card">
                         <a href="/products?categories%5B%5D=Tires" class="text-decoration-none">
                             <div class="card-body text-center">
-                                <i class="fas fa-gear fa-3x mb-3 text-primary"></i>
+                                <i class="fas fa-compact-disc fa-3x mb-3 text-primary"></i>
                                 <h5 class="card-title">Tires</h5>
                             </div>
                         </a>
