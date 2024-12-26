@@ -239,7 +239,6 @@
     </style>
 </head>
 <body>
-    <!-- Navbar -->
     <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container">
             <!-- Brand -->
@@ -335,42 +334,56 @@
     </nav>
     <!-- Main Content -->
     <main class="container mt-5 pt-5">
-        <!-- Hero Section -->
-        <section class="py-5 text-center fade-in">
-            <h1 class="display-4 fw-bold mb-4">
-                @php
-                    $hour = date('H');
-                    $greeting = '';
-                    if ($hour >= 5 && $hour < 12) {
-                        $greeting = 'Good Morning';
-                    } elseif ($hour >= 12 && $hour < 17) {
-                        $greeting = 'Good Afternoon';
-                    } elseif ($hour >= 17 && $hour < 22) {
-                        $greeting = 'Good Evening';
-                    } else {
-                        $greeting = 'Good Night';
-                    }
-                @endphp
-                {{ $greeting }}
-                @auth
-                    , {{ Auth::user()->name }}
-                @endauth
-            </h1>
-            <div class="alert alert-primary" role="alert">
-                img
-            </div>
-        </section>
-
         <!-- Categories Section -->
         <section class="py-5 fade-in">
-            <h2 class="text-center mb-4">Popular Categories</h2>
+            <h2 class="text-center mb-4">Categories</h2>
             <div class="row g-4">
                 <div class="col-md-4">
                     <div class="card">
-                        <a href="/products?categories%5B%5D=Engine+Parts" class="text-decoration-none">
+                        <a href="/products?categories%5B%5D=Cars" class="text-decoration-none">
+                            <div class="card-body text-center">
+                                <i class="fas fa-car fa-3x mb-3 text-primary"></i>
+                                <h5 class="card-title">Cars</h5>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <a href="/products?categories%5B%5D=Motorcycle" class="text-decoration-none">
+                            <div class="card-body text-center">
+                                <i class="fas fa-motorcycle fa-3x mb-3 text-primary"></i>
+                                <h5 class="card-title">Motorcycle</h5>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <a href="/products?categories%5B%5D=Lighting" class="text-decoration-none">
+                            <div class="card-body text-center">
+                                <i class="fas fa-lightbulb fa-3x mb-3 text-primary"></i>
+                                <h5 class="card-title">Lighting</h5>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <a href="/products?categories%5B%5D=Wheels" class="text-decoration-none">
+                            <div class="card-body text-center">
+                                <i class="fas fa-wheel fa-3x mb-3 text-primary"></i>
+                                <h5 class="card-title">Wheels</h5>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <a href="/products?categories%5B%5D=Tires" class="text-decoration-none">
                             <div class="card-body text-center">
                                 <i class="fas fa-gear fa-3x mb-3 text-primary"></i>
-                                <h5 class="card-title">Engine Parts</h5>
+                                <h5 class="card-title">Tires</h5>
                             </div>
                         </a>
                     </div>
@@ -395,57 +408,30 @@
                         </a>
                     </div>
                 </div>
-                <!-- button in the middle -->
-                <div class="col-md-12 text-center mt-4">
-                    <a href="/categories" class="btn btn-primary btn-lg">View All Categories</a>
+                <div class="col-md-4">
+                    <div class="card">
+                        <a href="/products?categories%5B%5D=Brake+System" class="text-decoration-none">
+                            <div class="card-body text-center">
+                                <i class="fas fa-sliders fa-3x mb-3 text-primary"></i>
+                                <h5 class="card-title">Brake System</h5>
+                            </div>
+                        </a>
+                    </div>
                 </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <a href="/products?categories%5B%5D=Engine+Parts" class="text-decoration-none">
+                            <div class="card-body text-center">
+                                <i class="fas fa-gear fa-3x mb-3 text-primary"></i>
+                                <h5 class="card-title">Engine Parts</h5>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <!-- button in the middle -->
             </div>
         </section>
         <!-- Add this section after the Categories Section -->
-<section class="py-5 fade-in">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Featured Products</h2>
-        <a href="/products" class="btn btn-outline-primary">View All</a>
-    </div>
-    <div class="row g-4">
-@foreach($featured_products as $product)
-<div class="col-md-3">
-    <div class="card h-100">
-        <div class="position-relative">
-            <img src="{{ $product->image }}" class="card-img-top" alt="{{ $product->name }}">
-            @if($product->badge)
-            <span class="position-absolute top-0 end-0 m-2 badge bg-{{ $product->badge_color }}">
-                {{ $product->badge }}
-            </span>
-            @endif
-        </div>
-        <div class="card-body">
-            <h5 class="card-title mb-1">{{ $product->name }}</h5>
-            <div class="mb-2">
-                @for($i = 1; $i <= 5; $i++)
-                    @if($i <= floor($product->rating))
-                        <i class="fas fa-star text-warning"></i>
-                    @elseif($i - 0.5 <= $product->rating)
-                        <i class="fas fa-star-half-alt text-warning"></i>
-                    @else
-                        <i class="far fa-star text-warning"></i>
-                    @endif
-                @endfor
-                <small class="text-secondary ms-1">({{ $product->reviews_count }} reviews)</small>
-            </div>
-            <p class="text-primary fw-bold mb-1">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
-            <p class="small text-secondary mb-2">
-                {{ $product->free_shipping ? 'Free shipping' : '+ Shipping fee' }}
-            </p>
-            <a href="{{ route('products.show', $product->id) }}" class="btn btn-primary w-100">
-                <i class="fas fa-eye me-2"></i>View Details
-            </a>
-        </div>
-    </div>
-</div>
-@endforeach
-    </div>
-</section>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

@@ -40,7 +40,7 @@ class ProductController extends Controller
 
         $products = $query->get();
 
-        $categories = ['All Categories', 'Brake System', 'Lighting', 'Engine Parts', 'Tools', 'Accessories'];
+        $categories = ['All Categories','Cars','Motorcycle' ,'Brake System', 'Lighting', 'Engine Parts', 'Tools', 'Accessories', 'Wheels', 'Tires'];
         
         return view('products.index', compact('products', 'categories'));
     }
@@ -58,4 +58,26 @@ class ProductController extends Controller
         
         return view('products.show', compact('product'));
     }
+    // categories for the products
+    public function categories()
+    {
+        $categories = ['Brake System', 'Lighting', 'Engine Parts', 'Tools', 'Accessories'];
+        return view('products.categories', compact('categories'));
+    }
+    // ...existing code...
+
+public function search(Request $request)
+{
+    $query = $request->input('query');
+    
+    // Search in multiple columns
+    $products = Product::where('name', 'LIKE', "%{$query}%")
+        ->orWhere('category', 'LIKE', "%{$query}%")
+        ->orWhere('description', 'LIKE', "%{$query}%")
+        ->get();
+
+    $categories = ['All Categories','Cars','Motorcycle' ,'Brake System', 'Lighting', 'Engine Parts', 'Tools', 'Accessories', 'Wheels', 'Tires'];
+
+    return view('products.results', compact('products', 'categories', 'query'));
+}
 }

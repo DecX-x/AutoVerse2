@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="light">
 <head>
@@ -246,18 +245,98 @@
         .card:hover {
             transform: var(--hover-transform);
         }
+        @media (max-width: 991.98px) {
+        .navbar-collapse {
+            background: var(--nav-bg);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 0.5rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        .navbar .container {
+            padding: 0.5rem 1rem;
+        }
+
+        .navbar-toggler {
+            padding: 4px 8px;
+            font-size: 1rem;
+        }
+
+        .search-input {
+            font-size: 0.9rem !important;
+            padding: 8px 16px !important;
+        }
+    }
+
+    .navbar-nav .nav-link {
+        padding: 0.5rem 1rem;
+        border-radius: 0.25rem;
+    }
+
+    .navbar-nav .nav-link:hover {
+        background: rgba(var(--bs-primary-rgb), 0.1);
+    }
+    @media (min-width: 992px) {
+        .navbar .container {
+            padding-left: 0;
+            max-width: 95%;
+            margin-left: 2rem;
+        }
+        
+        .navbar-brand {
+            margin-right: 3rem;
+        }
+        
+        .navbar-nav {
+            margin-left: -1rem;
+        }
+    }
+    @media (max-width: 991.98px) {
+        .filter-section {
+            display: none;
+        }
+        .filter-section.show {
+            display: block;
+        }
+    }
     </style>
 </head>
 <body>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="#">AutoVerse</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <!-- Brand -->
+            <a class="navbar-brand" href="/">AutoVerse</a>
+    
+            <!-- Mobile Menu Button -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
+    
+            <!-- Navbar Content -->
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <!-- Search Form - Full Width on Mobile -->
+                <form class="d-lg-none w-100 my-3" action="{{ route('products.search') }}" method="GET">
+                    <input 
+                        class="form-control search-input" 
+                        type="search"
+                        name="query" 
+                        placeholder="Search products..."
+                        required
+                        style="
+                            border-radius: 10px;
+                            padding: 10px 15px;
+                            font-size: 0.95rem;
+                            background: var(--input-bg);
+                            border: 1px solid var(--input-border);
+                            color: var(--text-color);
+                        "
+                    >
+                </form>
+    
+                <!-- Navigation Links -->
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
                         <a class="nav-link active" href="/">Home</a>
                     </li>
@@ -265,29 +344,53 @@
                         <a class="nav-link" href="/products">Products</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Categories</a>
+                        <a class="nav-link" href="/categories">Categories</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">Auction💰</a>
                     </li>
                 </ul>
-                <div class="d-flex align-items-center gap-3">
+    
+                <!-- Desktop Search -->
+                <form class="d-none d-lg-flex mx-2 me-auto" style="width: 55%;" action="{{ route('products.search') }}" method="GET">
+                    <input 
+                        class="form-control search-input" 
+                        type="search" 
+                        name="query"
+                        placeholder="Search for parts, tools, accessories..."
+                        required
+                        style="
+                            border-radius: 30px;
+                            padding: 10px 20px;
+                            font-size: 0.95rem;
+                            transition: all 0.3s ease;
+                            box-shadow: var(--box-shadow);
+                            background: var(--input-bg);
+                            border: 1px solid var(--input-border);
+                            color: var(--text-color);
+                            width: 100%;
+                        "
+                    >
+                </form>
+    
+                <!-- Action Buttons -->
+                <div class="d-flex align-items-center gap-2 mt-3 mt-lg-0">
                     <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
                         <i class="fas fa-sun"></i>
                     </button>
-                    <a href="#" class="btn btn-outline-primary">
-                        <i class="fas fa-shopping-cart me-2"></i>Cart
+                    <a href="#" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-shopping-cart me-2"></i><span class="d-none d-lg-inline">Cart</span>
                     </a>
                     @auth
                         <form action="{{ route('logout') }}" method="POST" class="d-inline">
                             @csrf
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-sign-out-alt me-2"></i>Logout
+                            <button type="submit" class="btn btn-primary btn-sm">
+                                <i class="fas fa-sign-out-alt me-2"></i><span class="d-none d-lg-inline">Logout</span>
                             </button>
                         </form>
                     @else
-                        <a href="{{ route('login') }}" class="btn btn-primary">
-                            <i class="fas fa-sign-in-alt me-2"></i>Login
+                        <a href="{{ route('login') }}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-sign-in-alt me-2"></i><span class="d-none d-lg-inline">Login</span>
                         </a>
                     @endauth
                 </div>
@@ -297,8 +400,11 @@
 
     <main class="container mt-5 pt-5">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1>Products</h1>
+            <h1 class="px-2">Products</h1>
             <div class="d-flex gap-3 align-items-center">
+                <button class="btn btn-outline-primary d-lg-none me-2" id="filter-toggle">
+                    <i class="fas fa-filter"></i>
+                </button>
                 <select class="form-select sort-select">
                     <option>Latest</option>
                     <option>Price: Low to High</option>
@@ -312,7 +418,7 @@
             <!-- Filters Sidebar -->
             <div class="col-lg-3">
                 <form action="{{ route('products.index') }}" method="GET" id="filterForm">
-                    <div class="filter-section">
+                    <div class="filter-section" id="filter-section">
                         <!-- Filter content remains the same -->
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <h5 class="mb-0">Filters</h5>
@@ -458,6 +564,13 @@
             function updateIcon(theme) {
                 icon.className = theme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
             }
+
+            const filterToggle = document.getElementById('filter-toggle');
+            const filterSection = document.getElementById('filter-section');
+
+            filterToggle.addEventListener('click', () => {
+                filterSection.classList.toggle('show');
+            });
         });
     </script>
 </body>
