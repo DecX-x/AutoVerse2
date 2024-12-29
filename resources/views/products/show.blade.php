@@ -386,11 +386,9 @@
         <img src="{{ $product->images[0] }}" id="mainImage" class="product-image" alt="{{ $product->name }}">
     </div>
     <div class="d-flex gap-2">
-        @foreach($product->images as $index => $image)
-        <img src="{{ $image }}" 
-             class="thumbnail {{ $index === 0 ? 'active' : '' }}"
-             onclick="changeImage(this.src)"
-             alt="Product thumbnail">
+        @foreach($product->images as $id => $image)
+        <img src="{{ $product->images[$id] ?? asset('placeholder.jpg') }}" class="thumbnail" alt="{{ $product->name }}" onclick="changeImage('{{ $product->images[$id] ?? asset('placeholder.jpg') }}')">
+        
         @endforeach
     </div>
 </div>
@@ -495,20 +493,22 @@
         });
 
         function changeImage(src) {
-            document.getElementById('mainImage').src = src;
-            document.querySelectorAll('.thumbnail').forEach(thumb => {
-                thumb.classList.remove('active');
-                if(thumb.src === src) thumb.classList.add('active');
-            });
-        }
+    document.getElementById('mainImage').src = src;
+    document.querySelectorAll('.thumbnail').forEach(thumb => {
+        thumb.classList.remove('active');
+        if (thumb.src === src) thumb.classList.add('active');
+    });
+}
+}
 
-        function updateQuantity(change) {
-            const input = document.getElementById('quantity');
-            const newValue = parseInt(input.value) + change;
-            if(newValue >= 1 && newValue <= {{ $product['stock'] }}) {
-                input.value = newValue;
-            }
-        }
+function updateQuantity(change) {
+    const input = document.getElementById('quantity');
+    const newValue = parseInt(input.value) + change;
+    if (newValue >= 1 && newValue <= {{ $product->stock }}) {
+        input.value = newValue;
+    }
+}
+
     </script>
 </body>
 </html>

@@ -1,3 +1,4 @@
+
 @extends('products.index')
 
 @section('title', 'Search Results - AutoVerse')
