@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="light">
 <head>
@@ -354,7 +353,7 @@
                     <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
                         <i class="fas fa-sun"></i>
                     </button>
-                    <a href="#" class="btn btn-outline-primary btn-sm">
+                    <a href="/cart" class="btn btn-outline-primary btn-sm">
                         <i class="fas fa-shopping-cart me-2"></i><span class="d-none d-lg-inline">Cart</span>
                     </a>
                     @auth
@@ -383,12 +382,14 @@
             <!-- Product Images -->
 <div class="col-md-6">
     <div class="position-relative mb-3">
-        <img src="{{ $product->images[0] }}" id="mainImage" class="product-image" alt="{{ $product->name }}">
+        <img src="{{ is_array($product->images) ? $product->images[0] : $product->images }}" id="mainImage" class="product-image" alt="{{ $product->name }}">
     </div>
     <div class="d-flex gap-2">
-        @foreach($product->images as $id => $image)
-        <img src="{{ $product->images[$id] ?? asset('placeholder.jpg') }}" class="thumbnail" alt="{{ $product->name }}" onclick="changeImage('{{ $product->images[$id] ?? asset('placeholder.jpg') }}')">
-        
+        @php
+            $imageArray = is_array($product->images) ? $product->images : [$product->images];
+        @endphp
+        @foreach($imageArray as $image)
+        <img src="{{ $image }}" class="thumbnail" alt="{{ $product->name }}" onclick="changeImage('{{ $image }}')">
         @endforeach
     </div>
 </div>
@@ -413,23 +414,55 @@
         </div>
     </div>
 
-    <h2 class="text-primary mb-3">{{ $product->formatted_price }}</h2>
+    <div class="mb-3">
+        @if($product->discount_price)
+            <div class="d-flex align-items-center gap-2">
+                <h2 class="text-danger mb-0">Rp {{ number_format($product->discount_price, 0, ',', '.') }}</h2>
+                <span class="text-decoration-line-through text-muted">
+                    Rp {{ number_format($product->price, 0, ',', '.') }}
+                </span>
+                @php
+                    $savings = $product->price - $product->discount_price;
+                    $savingsPercent = round(($savings / $product->price) * 100);
+                @endphp
+                <span class="badge bg-danger">
+                    Save {{ $savingsPercent }}%
+                </span>
+            </div>
+        @else
+            <h2 class="text-primary mb-0">Rp {{ number_format($product->price, 0, ',', '.') }}</h2>
+        @endif
+    </div>
     
     <p class="mb-4">{{ $product->description }}</p>
 
+    <!-- Replace existing add to cart button with this form -->
     <div class="mb-4">
-        <div class="d-flex align-items-center gap-3">
-            <div class="input-group" style="width: 150px;">
-                <button class="btn btn-outline-secondary" type="button" onclick="updateQuantity(-1)">-</button>
-                <input type="number" class="form-control quantity-input" id="quantity" value="1" min="1" max="{{ $product->stock }}">
-                <button class="btn btn-outline-secondary" type="button" onclick="updateQuantity(1)">+</button>
+        <form action="{{ route('cart.add') }}" method="POST">
+            @csrf
+            <input type="hidden" name="product_id" value="{{ $product->id }}">
+            <div class="d-flex align-items-center gap-3">
+                <div class="input-group" style="width: 150px;">
+                    <button class="btn btn-outline-secondary" type="button" onclick="updateQuantity(-1)">-</button>
+                    <input type="number" class="form-control quantity-input" id="quantity" name="quantity" 
+                           value="1" min="1" max="{{ $product->stock }}">
+                    <button class="btn btn-outline-secondary" type="button" onclick="updateQuantity(1)">+</button>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-cart-plus me-2"></i>Add to Cart
+                </button>
             </div>
-            <button class="btn btn-primary">
-                <i class="fas fa-cart-plus me-2"></i>Add to Cart
-            </button>
-        </div>
+        </form>
         <small class="text-secondary mt-2 d-block">{{ $product->stock }} items in stock</small>
     </div>
+    
+    <!-- Add flash message section after navbar -->
+    @if(session('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    @endif
 
     <!-- Features -->
     <div class="mb-4">
@@ -467,48 +500,51 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Copy theme toggle script from home.blade.php
-        document.addEventListener('DOMContentLoaded', () => {
-            const themeToggle = document.getElementById('theme-toggle');
-            const html = document.documentElement;
-            const icon = themeToggle.querySelector('i');
+       <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+        const icon = themeToggle.querySelector('i');
+        
+        // Initialize theme from localStorage
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        html.setAttribute('data-bs-theme', savedTheme);
+        updateIcon(savedTheme);
+    
+        // Theme toggle event listener
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-bs-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
             
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            html.setAttribute('data-bs-theme', savedTheme);
-            updateIcon(savedTheme);
-
-            themeToggle.addEventListener('click', () => {
-                const currentTheme = html.getAttribute('data-bs-theme');
-                const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-                
-                html.setAttribute('data-bs-theme', newTheme);
-                localStorage.setItem('theme', newTheme);
-                updateIcon(newTheme);
-            });
-
-            function updateIcon(theme) {
-                icon.className = theme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
-            }
+            html.setAttribute('data-bs-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateIcon(newTheme);
         });
-
-        function changeImage(src) {
-    document.getElementById('mainImage').src = src;
-    document.querySelectorAll('.thumbnail').forEach(thumb => {
-        thumb.classList.remove('active');
-        if (thumb.src === src) thumb.classList.add('active');
     });
-}
-}
-
-function updateQuantity(change) {
-    const input = document.getElementById('quantity');
-    const newValue = parseInt(input.value) + change;
-    if (newValue >= 1 && newValue <= {{ $product->stock }}) {
-        input.value = newValue;
+    
+    // Update icon based on theme
+    function updateIcon(theme) {
+        const icon = document.querySelector('.theme-toggle i');
+        icon.className = theme === 'light' ? 'fas fa-moon' : 'fas fa-sun';
     }
-}
-
+    
+    // Product image functions
+    function changeImage(src) {
+        document.getElementById('mainImage').src = src;
+        document.querySelectorAll('.thumbnail').forEach(thumb => {
+            thumb.classList.remove('active');
+            if (thumb.src === src) thumb.classList.add('active');
+        });
+    }
+    
+    // Quantity update function
+    function updateQuantity(change) {
+        const input = document.getElementById('quantity');
+        const newValue = parseInt(input.value) + change;
+        if (newValue >= 1 && newValue <= {{ $product->stock }}) {
+            input.value = newValue;
+        }
+    }
     </script>
 </body>
 </html>

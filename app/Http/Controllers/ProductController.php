@@ -13,37 +13,48 @@ class ProductController extends Controller
     }
 
     public function index(Request $request)
-    {
-        $query = Product::query();
+{
+    $query = Product::query();
 
-        // Apply filters
-        if ($request->has('categories')) {
-            $query->whereIn('category', $request->categories);
-        }
-
-        if ($request->has('price')) {
-            $query->where(function($q) use ($request) {
-                foreach($request->price as $range) {
-                    list($min, $max) = explode('-', $range);
-                    $q->orWhereBetween('price', [$min, $max]);
-                }
-            });
-        }
-
-        if ($request->has('rating')) {
-            $query->whereIn(\Illuminate\Support\Facades\DB::raw('FLOOR(rating)'), $request->rating);
-        }
-
-        if ($request->has('shipping')) {
-            $query->where('free_shipping', true);
-        }
-
-        $products = $query->get();
-
-        $categories = ['All Categories','Cars','Motorcycle' ,'Brake System', 'Lighting', 'Engine Parts', 'Tools', 'Accessories', 'Wheels', 'Tires'];
-        
-        return view('products.index', compact('products', 'categories'));
+    // Apply filters
+    if ($request->has('categories')) {
+        $query->whereIn('category', $request->categories);
     }
+
+    if ($request->has('price')) {
+        $query->where(function($q) use ($request) {
+            foreach($request->price as $range) {
+                list($min, $max) = explode('-', $range);
+                $q->orWhereBetween('price', [$min, $max]);
+            }
+        });
+    }
+
+    if ($request->has('rating')) {
+        $query->whereIn(\Illuminate\Support\Facades\DB::raw('FLOOR(rating)'), $request->rating);
+    }
+
+    if ($request->has('shipping')) {
+        $query->where('free_shipping', true);
+    }
+
+    $products = $query->get();
+
+    // Process image paths
+    foreach($products as $product) {
+        if ($product->image) {
+            // Remove 'public/' from the beginning if it exists
+            $product->image = str_replace('public/', '', $product->image);
+            $product->image = asset($product->image);
+        } else {
+            $product->image = asset('assets/images/placeholder.jpg');
+        }
+    }
+
+    $categories = ['All Categories','Cars','Motorcycle' ,'Brake System', 'Lighting', 'Engine Parts', 'Tools', 'Accessories', 'Wheels', 'Tires'];
+    
+    return view('products.index', compact('products', 'categories'));
+}
     public function show($id)
     {
         $product = Product::findOrFail($id);
@@ -53,8 +64,15 @@ class ProductController extends Controller
         $product->specifications = $product->specifications ?? [];
         $product->features = $product->features ?? [];
         
-        // Create images array if using single image
-        $product->images = [$product->image];
+        // Create images array with full path
+        $imagePath = $product->image;
+        if ($imagePath) {
+            // Remove 'public/' from the beginning if it exists
+            $imagePath = str_replace('public/', '', $imagePath);
+            $product->images = [asset($imagePath)];
+        } else {
+            $product->images = [asset('assets/images/placeholder.jpg')];
+        }
         
         return view('products.show', compact('product'));
     }
@@ -66,18 +84,29 @@ class ProductController extends Controller
     }
     // ...existing code...
 
-public function search(Request $request)
-{
-    $query = $request->input('query');
+    public function search(Request $request)
+    {
+        $query = $request->input('query');
+        
+        // Search in multiple columns
+        $products = Product::where('name', 'LIKE', "%{$query}%")
+            ->orWhere('category', 'LIKE', "%{$query}%")
+            ->orWhere('description', 'LIKE', "%{$query}%")
+            ->get();
     
-    // Search in multiple columns
-    $products = Product::where('name', 'LIKE', "%{$query}%")
-        ->orWhere('category', 'LIKE', "%{$query}%")
-        ->orWhere('description', 'LIKE', "%{$query}%")
-        ->get();
-
-    $categories = ['All Categories','Cars','Motorcycle' ,'Brake System', 'Lighting', 'Engine Parts', 'Tools', 'Accessories', 'Wheels', 'Tires'];
-
-    return view('products.results', compact('products', 'categories', 'query'));
-}
+        // Process image paths
+        foreach($products as $product) {
+            if ($product->image) {
+                // Remove 'public/' from the beginning if it exists
+                $product->image = str_replace('public/', '', $product->image);
+                $product->image = asset($product->image);
+            } else {
+                $product->image = asset('assets/images/placeholder.jpg');
+            }
+        }
+    
+        $categories = ['All Categories','Cars','Motorcycle' ,'Brake System', 'Lighting', 'Engine Parts', 'Tools', 'Accessories', 'Wheels', 'Tires'];
+    
+        return view('products.results', compact('products', 'categories', 'query'));
+    }
 }

@@ -15,7 +15,9 @@ class User extends Authenticatable
         'email',
         'password',
         'profile_image',
-        'address'
+        'address',
+        'seller',
+        'admin'
     ];
 
     protected $hidden = [
@@ -27,5 +29,38 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    
+    public function isAdmin()
+    {
+        return $this->admin === 'true';
+    }
+
+    public function isPendingSeller()
+    {
+        return $this->seller === 'pending';
+    }
+
+    public function createSellerProfile()
+    {
+        if ($this->seller === 'approved' && !$this->seller()->exists()) {
+            return $this->seller()->create([
+                'total_revenue' => 0,
+                'total_products_sold' => 0
+            ]);
+        }
+        return null;
+    }
+    public function seller()
+    {
+        return $this->hasOne(Seller::class);
+    }
+
+    public function getSellerProfile()
+    {
+        return $this->seller()->firstOrCreate([
+            'user_id' => $this->id
+        ], [
+            'total_revenue' => 0,
+            'total_products_sold' => 0
+        ]);
+    }
 }

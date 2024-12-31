@@ -116,7 +116,13 @@ class AuthController extends Controller
     
         return back()->with('success', 'Address updated successfully');
     }
+    public function requestSeller(Request $request)
+{
+    $user = Auth::user();
+    $user->seller = 'pending';
+    $user->save();
+    
+    return back()->with('success', 'Seller request submitted successfully');
+}
 
-    
-    
 }

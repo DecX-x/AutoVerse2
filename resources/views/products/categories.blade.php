@@ -84,7 +84,7 @@
                     <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
                         <i class="fas fa-sun"></i>
                     </button>
-                    <a href="#" class="btn btn-outline-primary btn-sm">
+                    <a href="/cart" class="btn btn-outline-primary btn-sm">
                         <i class="fas fa-shopping-cart me-2"></i><span class="d-none d-lg-inline">Cart</span>
                     </a>
                     @auth
