@@ -44,10 +44,28 @@ main {
     flex: 1;
 }
 body {
-    background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+    background: linear-gradient(150deg, 
+        var(--gradient-start) 0%,
+        var(--gradient-end) 100%
+    );
+    background-attachment: fixed;
+    background-size: 400% 400%;
     color: var(--text-color);
     min-height: 100vh;
     transition: all 0.5s ease;
+    animation: gradientMove 15s ease infinite;
+}
+
+@keyframes gradientMove {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
 .navbar {
@@ -94,14 +112,22 @@ body {
     background: var(--primary-dark);
 }
 
+.image-ad {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
 .image-ad img {
-    width: 800px;
-    height: 400px;
+    width: 100%;
+    height: auto;
+    max-height: 400px;
     object-fit: cover;
     border-radius: 0.5rem;
     box-shadow: var(--box-shadow);
-
 }
+
 .card {
     background: var(--card-bg);
     border: none;
@@ -404,4 +430,82 @@ body {
 
 [data-bs-theme="dark"] .footer-col form button:hover {
     background: var(--primary-light);
+}
+
+@media (max-width: 1200px) {
+    .container {
+        padding: 0 15px;
+    }
+    
+    .image-ad {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 992px) {
+    .image-ad img {
+        max-height: 350px;
+    }
+
+    .navbar-brand {
+        font-size: 1.3rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .image-ad img {
+        max-height: 300px;
+    }
+
+    .navbar-brand {
+        font-size: 1.2rem;
+    }
+
+    .theme-toggle {
+        width: 35px;
+        height: 35px;
+    }
+
+    .footer-col h4 {
+        font-size: 30px;
+        text-align: center;
+    }
+
+    .footer-col .links li {
+        text-align: center;
+    }
+
+    .footer-col p {
+        text-align: center;
+        margin: 20px auto;
+    }
+
+    .social-media-container {
+        justify-content: center;
+    }
+
+    .footer-col .icons {
+        float: none;
+        justify-content: center;
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 576px) {
+    .image-ad img {
+        max-height: 200px;
+    }
+
+    .navbar .container {
+        padding: 0.5rem;
+    }
+
+    .footer {
+        padding: 20px 10px;
+    }
+
+    .footer .footer-row {
+        padding: 15px;
+        gap: 2rem;
+    }
 }

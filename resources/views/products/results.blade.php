@@ -20,11 +20,15 @@
             <div class="card h-100">
                 <!-- Same card structure as index.blade.php -->
                 <div class="position-relative">
-                    <img src="{{ $product->image }}" class="card-img-top" alt="{{ $product->name }}">
+                    <img src="{{ $product->image }}" 
+                         class="card-img-top" 
+                         alt="{{ $product->name }}"
+                         onerror="this.src='{{ asset('assets/images/placeholder.jpg') }}'"
+                    >
                     @if($product->badge)
-                    <span class="position-absolute top-0 end-0 m-2 badge bg-{{ $product->badge_color }}">
-                        {{ $product->badge }}
-                    </span>
+                        <span class="position-absolute top-0 end-0 m-2 badge bg-{{ $product->badge_color }}">
+                            {{ $product->badge }}
+                        </span>
                     @endif
                 </div>
                 <div class="card-body">

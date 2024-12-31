@@ -212,6 +212,24 @@
             font-size: 0.9rem !important;
             padding: 8px 16px !important;
         }
+
+        .profile-header {
+            text-align: center;
+        }
+
+        .profile-header .col-md-3,
+        .profile-header .col-md-9 {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .profile-header .col-md-9 {
+            text-align: center;
+        }
+
+        .profile-section {
+            padding: 1rem;
+        }
     }
 
     .navbar-nav .nav-link {
@@ -222,7 +240,7 @@
     .navbar-nav .nav-link:hover {
         background: rgba(var(--bs-primary-rgb), 0.1);
     }
-    @media (min-width: 992px) {
+    @media (min-width: 370px) {
         .navbar .container {
             padding-left: 0;
             max-width: 95%;
@@ -235,6 +253,11 @@
         
         .navbar-nav {
             margin-left: -1rem;
+        }
+
+        .profile-header .col-md-3 .update-photo-btn {
+            display: block;
+            margin-top: 1rem;
         }
     }
         .profile-header {
@@ -338,7 +361,7 @@
                     <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
                         <i class="fas fa-sun"></i>
                     </button>
-                    <a href="#" class="btn btn-outline-primary btn-sm">
+                    <a href="/cart" class="btn btn-outline-primary btn-sm">
                         <i class="fas fa-shopping-cart me-2"></i><span class="d-none d-lg-inline">Cart</span>
                     </a>
                     @auth
@@ -367,7 +390,7 @@
                         class="profile-image mb-3"
                         alt="Profile Picture"
                     >
-                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#updatePhotoModal">
+                    <button class="btn btn-primary btn-sm update-photo-btn mx-auto my-1" data-bs-toggle="modal" data-bs-target="#updatePhotoModal">
                         <i class="fas fa-camera me-2"></i>Update Photo
                     </button>
                 </div>
@@ -383,9 +406,29 @@
                     <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
                         <i class="fas fa-edit me-2"></i>Edit Profile
                     </button>
-                    <a href="#" class="btn btn-success ms-2">
-                        <i class="fas fa-store me-2"></i>Become a Seller
+                                        <!-- Replace the existing seller button with this conditional block -->
+                    @if(Auth::user()->admin === 'true')
+                        <a href="{{ route('admin.dashboard') }}" class="my-2 btn btn-danger ms-2">
+                            <i class="fas fa-user-shield me-2"></i>Admin Dashboard
+                        </a>
+                    @endif
+                    
+                    @if(Auth::user()->seller === 'false')
+                        <form action="{{ route('request.seller') }}" method="POST" class="d-inline">
+                            @csrf
+                            <button type="submit" class="my-2 btn btn-success ms-2">
+                                <i class="fas fa-store me-2"></i>Become a Seller
+                            </button>
+                        </form>
+                    @elseif(Auth::user()->seller === 'pending')
+                        <button class="my-2 btn btn-warning ms-2" disabled>
+                            <i class="fas fa-clock me-2"></i>Waiting for Approval
+                        </button>
+                    @elseif(Auth::user()->seller === 'approved')
+                    <a href="{{ route('seller.dashboard') }}" class="my-2 btn btn-info ms-2">
+                        <i class="fas fa-chart-line me-2"></i>Seller Dashboard
                     </a>
+                @endif
                 </div>
             </div>
         </div>
@@ -398,14 +441,11 @@
                         <a href="#" class="list-group-item list-group-item-action">
                             <i class="fas fa-shopping-bag me-2"></i>My Orders
                         </a>
-                        <a href="#" class="list-group-item list-group-item-action">
-                            <i class="fas fa-heart me-2"></i>Wishlist
+                        <a href="/cart" class="list-group-item list-group-item-action">
+                            <i class="fas fa-cart-shopping me-2"></i>Cart
                         </a>
                         <a href="#" class="list-group-item list-group-item-action">
                             <i class="fas fa-map-marker-alt me-2"></i>Addresses
-                        </a>
-                        <a href="#" class="list-group-item list-group-item-action">
-                            <i class="fas fa-cog me-2"></i>Settings
                         </a>
                     </div>
                 </div>

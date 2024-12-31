@@ -10,8 +10,7 @@ class Product extends Model
         'name',
         'category',
         'price',
-        'rating',
-        'reviews_count',
+        'discount_price',
         'description',
         'badge',
         'badge_color',
@@ -19,8 +18,14 @@ class Product extends Model
         'image',
         'stock',
         'features',
-        'specifications'
+        'specifications',
+        'seller_id'
     ];
+
+    public function seller()
+    {
+        return $this->belongsTo(Seller::class);
+    }
 
     protected $casts = [
         'price' => 'decimal:2',
