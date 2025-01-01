@@ -36,8 +36,11 @@
                     <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
                         <i class="fas fa-sun"></i>
                     </button>
-                    <a href="#" class="btn btn-outline-primary">
+                    <a href="{{ route('cart.index') }}" class="btn btn-outline-primary">
                         <i class="fas fa-shopping-cart me-2"></i>Cart
+                    </a>
+                    <a href="{{ route('orders') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-box me-2"></i>Orders
                     </a>
                     <form action="{{ route('logout') }}" method="POST" class="d-inline">
                         @csrf

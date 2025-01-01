@@ -499,9 +499,14 @@
                             <strong>Total</strong>
                             <strong>Rp {{ number_format($total, 0, ',', '.') }}</strong>
                         </div>
-                        <button class="btn btn-primary w-100" {{ $cartItems->isEmpty() ? 'disabled' : '' }}>
-                            Proceed to Checkout
-                        </button>
+                        <!-- Add Midtrans Payment Form -->
+                        <form id="payment-form" method="post" action="{{ route('payment.create') }}">
+                            @csrf
+                            <input type="hidden" name="total" value="{{ $total }}">
+                            <button type="button" class="btn btn-primary w-100" id="pay-button" @if($cartItems->isEmpty()) disabled @endif>
+                                Proceed to Checkout
+                            </button>
+                        </form>
                         <a href="{{ route('products.index') }}" class="btn btn-outline-primary w-100 mt-2">
                             Continue Shopping
                         </a>
@@ -512,6 +517,60 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Add Midtrans Snap.js -->
+    <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('services.midtrans.client_key') }}"></script>
+    <script>
+        const payButton = document.getElementById('pay-button');
+        payButton.addEventListener('click', async function () {
+            try {
+                // Show loading state
+                payButton.disabled = true;
+                payButton.innerHTML = 'Processing...';
+
+                // Make the payment request
+                const response = await fetch('{{ route('payment.create') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        total: {{ $total ?? 0 }}
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Payment failed');
+                }
+
+                // Open Snap payment popup
+                window.snap.pay(data.snap_token, {
+                    onSuccess: function(result) {
+                        alert('Payment successful!');
+                        window.location.href = '{{ route('orders') }}';
+                    },
+                    onPending: function(result) {
+                        alert('Payment pending. Please complete your payment.');
+                        window.location.href = '{{ route('orders') }}';
+                    },
+                    onError: function(result) {
+                        alert('Payment failed. Please try again.');
+                    },
+                    onClose: function() {
+                        payButton.disabled = false;
+                        payButton.innerHTML = 'Proceed to Checkout';
+                    }
+                });
+            } catch (error) {
+                console.error('Payment Error:', error);
+                alert('Payment failed: ' + error.message);
+                payButton.disabled = false;
+                payButton.innerHTML = 'Proceed to Checkout';
+            }
+        });
+    </script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const themeToggle = document.getElementById('theme-toggle');

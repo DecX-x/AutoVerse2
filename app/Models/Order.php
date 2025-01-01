@@ -12,19 +12,26 @@ class Order extends Model
 
     protected $fillable = [
         'user_id',
-        'total_amount',
-        'shipping_address',
-        'payment_method',
-        'status'
+        'order_id',
+        'total',
+        'status',
     ];
+
+    /**
+     * Get the status color for the badge
+     */
+    public function getStatusColorAttribute()
+    {
+        return [
+            'pending' => 'warning',
+            'processing' => 'info',
+            'completed' => 'success',
+            'cancelled' => 'danger',
+        ][$this->status] ?? 'secondary';
+    }
 
     public function user()
     {
         return $this->belongsTo(User::class);
-    }
-
-    public function products()
-    {
-        return $this->belongsToMany(Product::class)->withPivot(['quantity', 'price']);
     }
 }

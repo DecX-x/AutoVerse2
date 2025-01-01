@@ -9,6 +9,8 @@ use App\Http\Controllers\DetailController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\SellerController;
+use App\Http\Controllers\PaymentController;
+
 
 // Public Routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -64,4 +66,8 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
     Route::get('/orders', [OrderController::class, 'index'])->name('orders');
     Route::post('/checkout', [OrderController::class, 'checkout'])->name('checkout');
+    Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
 });
+
+Route::post('/payment', [PaymentController::class, 'createTransaction'])->name('payment.create');
+Route::post('/payment/notification', [PaymentController::class, 'notificationHandler'])->name('payment.notification');

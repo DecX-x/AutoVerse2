@@ -63,4 +63,9 @@ class User extends Authenticatable
             'total_products_sold' => 0
         ]);
     }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
 }

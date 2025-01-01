@@ -13,54 +13,41 @@ class OrderController extends Controller
 {
     public function index()
     {
-        $orders = Order::where('user_id', Auth::id())
-            ->with('products')
+        $orders = auth()->user()->orders()
+            ->with(['orderItems.product']) // Eager load relationships
             ->latest()
-            ->paginate(10);
-            
-        return view('orders.index', compact('orders'));
+            ->get();
+        return view('orders', compact('orders'));
     }
 
-    public function checkout(Request $request)
+    public function store(Request $request)
     {
-        $request->validate([
-            'shipping_address' => 'required|string',
-            'payment_method' => 'required|in:credit_card,paypal'
-        ]);
-
         try {
             DB::beginTransaction();
-
-            $cart = Cart::where('user_id', Auth::id())->with('products')->firstOrFail();
+            
+            // Create order from cart
+            $cart = Cart::where('user_id', Auth::id())->with('items')->firstOrFail();
             
             $order = Order::create([
-                'user_id' => Auth::id(),
-                'total_amount' => $cart->products->sum('price'),
-                'shipping_address' => $request->shipping_address,
-                'payment_method' => $request->payment_method,
-                'status' => 'pending'
+                'user_id' => Auth::id(), // Mendapatkan ID pengguna yang sedang login
+                'order_id' => 'ORD-' . now()->timestamp, // Gunakan timestamp yang lebih eksplisit
+                'total' => $cart->items->sum(function ($item) {
+                    // Periksa apakah product memiliki harga diskon, jika tidak gunakan harga normal
+                    $price = $item->product->discount_price ?? $item->product->price;
+                    return $price * $item->quantity; // Hitung subtotal untuk setiap item
+                }),
+                'status' => 'pending' // Set status awal sebagai pending
             ]);
-
-            // Transfer cart items to order
-            foreach ($cart->products as $product) {
-                $order->products()->attach($product->id, [
-                    'quantity' => $product->pivot->quantity,
-                    'price' => $product->price
-                ]);
-            }
-
             // Clear cart
-            $cart->products()->detach();
+            $cart->items()->delete();
             $cart->delete();
 
             DB::commit();
-
-            return redirect()->route('orders.show', $order)
-                ->with('success', 'Order placed successfully!');
+            return redirect()->route('orders')->with('success', 'Order placed successfully!');
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Something went wrong!');
+            return back()->with('error', 'Failed to place order. Please try again.');
         }
     }
 }
