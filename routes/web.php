@@ -10,6 +10,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\SellerController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\AuctionController;
 
 
 // Public Routes
@@ -69,5 +70,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
 });
 
+// Payment Routes
 Route::post('/payment', [PaymentController::class, 'createTransaction'])->name('payment.create');
 Route::post('/payment/notification', [PaymentController::class, 'notificationHandler'])->name('payment.notification');
+
+// Auction Routes
+Route::get('/auction', [AuctionController::class, 'index'])->name('auction.index');
+Route::get('/auction/{id}', [AuctionController::class, 'show'])->name('auction.show');
+
+Route::get('/auctions', [AuctionController::class, 'index'])->name('auction.index');

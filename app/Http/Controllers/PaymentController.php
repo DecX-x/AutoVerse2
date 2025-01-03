@@ -5,6 +5,11 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Midtrans\Config;
 use Midtrans\Snap;
+use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\Cart;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class PaymentController extends Controller
 {
@@ -30,7 +35,6 @@ class PaymentController extends Controller
         ];
 
         try {
-            // Fix: Use Snap directly without ::
             $snapToken = Snap::getSnapToken($params);
             return response()->json(['snap_token' => $snapToken]);
         } catch (\Exception $e) {
@@ -43,29 +47,40 @@ class PaymentController extends Controller
         $notification = new \Midtrans\Notification();
 
         $transaction = $notification->transaction_status;
-        $type = $notification->payment_type;
         $orderId = $notification->order_id;
-        $fraud = $notification->fraud_status;
 
-        // Handle the notification based on the transaction status
-        if ($transaction == 'capture') {
-            if ($type == 'credit_card') {
-                if ($fraud == 'challenge') {
-                    // Handle challenge status
-                } else {
-                    // Handle success status
+        if ($transaction == 'capture' || $transaction == 'settlement') {
+            try {
+                DB::beginTransaction();
+
+                $cart = Cart::where('user_id', Auth::id())->with('items.product')->firstOrFail();
+
+                $order = Order::create([
+                    'user_id' => Auth::id(),
+                    'order_id' => $orderId,
+                    'total' => $cart->items->sum(function ($item) {
+                        return ($item->product->discount_price ?? $item->product->price) * $item->quantity;
+                    }),
+                    'status' => 'completed'
+                ]);
+
+                foreach ($cart->items as $item) {
+                    OrderItem::create([
+                        'order_id' => $order->id,
+                        'product_id' => $item->product_id,
+                        'quantity' => $item->quantity,
+                        'price' => $item->product->discount_price ?? $item->product->price,
+                    ]);
                 }
+
+                $cart->items()->delete();
+                $cart->delete();
+
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollBack();
+                return response()->json(['message' => $e->getMessage()], 500);
             }
-        } else if ($transaction == 'settlement') {
-            // Handle settlement status
-        } else if ($transaction == 'pending') {
-            // Handle pending status
-        } else if ($transaction == 'deny') {
-            // Handle deny status
-        } else if ($transaction == 'expire') {
-            // Handle expire status
-        } else if ($transaction == 'cancel') {
-            // Handle cancel status
         }
 
         return response()->json(['message' => 'Notification handled']);

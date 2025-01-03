@@ -50,4 +50,10 @@ class OrderController extends Controller
             return back()->with('error', 'Failed to place order. Please try again.');
         }
     }
+
+    public function show(Order $order)
+    {
+        $order->load('orderItems.product');
+        return view('order-details', compact('order'));
+    }
 }

@@ -523,11 +523,9 @@
         const payButton = document.getElementById('pay-button');
         payButton.addEventListener('click', async function () {
             try {
-                // Show loading state
                 payButton.disabled = true;
                 payButton.innerHTML = 'Processing...';
 
-                // Make the payment request
                 const response = await fetch('{{ route('payment.create') }}', {
                     method: 'POST',
                     headers: {
@@ -545,7 +543,6 @@
                     throw new Error(data.message || 'Payment failed');
                 }
 
-                // Open Snap payment popup
                 window.snap.pay(data.snap_token, {
                     onSuccess: function(result) {
                         alert('Payment successful!');

@@ -17,9 +17,6 @@ class Order extends Model
         'status',
     ];
 
-    /**
-     * Get the status color for the badge
-     */
     public function getStatusColorAttribute()
     {
         return [
@@ -33,5 +30,10 @@ class Order extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class);
     }
 }
