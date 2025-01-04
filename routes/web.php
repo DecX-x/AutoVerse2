@@ -11,6 +11,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\SellerController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\AuctionController;
+use App\Http\Controllers\AuctionPaymentController;
 
 
 // Public Routes
@@ -73,9 +74,18 @@ Route::middleware(['auth'])->group(function () {
 // Payment Routes
 Route::post('/payment', [PaymentController::class, 'createTransaction'])->name('payment.create');
 Route::post('/payment/notification', [PaymentController::class, 'notificationHandler'])->name('payment.notification');
-
+Route::post('/auction/{id}/payment', [AuctionPaymentController::class, 'createPayment'])
+    ->name('auction.payment.create')
+    ->middleware('auth');
 // Auction Routes
 Route::get('/auction', [AuctionController::class, 'index'])->name('auction.index');
 Route::get('/auction/{id}', [AuctionController::class, 'show'])->name('auction.show');
-
+Route::get('/auctions/{auction}', [AuctionController::class, 'show'])->name('auctions.show');
 Route::get('/auctions', [AuctionController::class, 'index'])->name('auction.index');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/auction', [AuctionController::class, 'index'])->name('auction.index');
+    Route::get('/auction/{id}', [AuctionController::class, 'show'])->name('auction.show');
+    Route::post('/auction/{id}/bid', [AuctionController::class, 'placeBid'])->name('auction.bid');
+    Route::post('/seller/auctions', [SellerController::class, 'storeAuction'])->name('seller.auctions.store');
+
+});

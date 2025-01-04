@@ -282,6 +282,69 @@
             margin-bottom: 1rem;
             box-shadow: var(--box-shadow);
         }
+
+        /* Add these new styles inside the existing <style> tag */
+        .stats-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: var(--box-shadow);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(var(--bs-primary-rgb), 0.1);
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(37, 99, 235, 0.15);
+        }
+
+        .stats-card h3 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .table {
+            border-radius: 10px;
+            overflow: hidden;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .table thead th {
+            background: rgba(var(--bs-primary-rgb), 0.1);
+            border: none;
+            padding: 1rem;
+            font-weight: 600;
+        }
+
+        .table tbody td {
+            padding: 1rem;
+            vertical-align: middle;
+        }
+
+        .table tbody tr {
+            transition: all 0.3s ease;
+        }
+
+        .table tbody tr:hover {
+            background: rgba(var(--bs-primary-rgb), 0.05);
+        }
+
+        .btn-action {
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            margin: 0 2px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-action:hover {
+            transform: translateY(-2px);
+        }
     </style>
 </head>
 <body>
@@ -328,7 +391,7 @@
                         <a class="nav-link" href="/categories">Categories</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Auction💰</a>
+                        <a class="nav-link" href="/auctions">Auction💰</a>
                     </li>
                 </ul>
     
@@ -391,20 +454,23 @@
         <div class="row mb-4">
             <div class="col-md-4">
                 <div class="stats-card p-4 text-center">
+                    <i class="fas fa-box-open mb-3 text-primary" style="font-size: 2rem;"></i>
                     <h3 class="text-primary">{{ $totalProducts }}</h3>
-                    <p class="text-muted">Total Products</p>
+                    <p class="text-muted mb-0">Total Products</p>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="stats-card p-4 text-center">
+                    <i class="fas fa-shopping-cart mb-3 text-success" style="font-size: 2rem;"></i>
                     <h3 class="text-success">{{ $totalSold }}</h3>
-                    <p class="text-muted">Products Sold</p>
+                    <p class="text-muted mb-0">Products Sold</p>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="stats-card p-4 text-center">
+                    <i class="fas fa-money-bill-wave mb-3 text-warning" style="font-size: 2rem;"></i>
                     <h3 class="text-warning">Rp.{{ number_format($totalRevenue, 2) }}</h3>
-                    <p class="text-muted">Total Revenue</p>
+                    <p class="text-muted mb-0">Total Revenue</p>
                 </div>
             </div>
         </div>
@@ -491,6 +557,127 @@
                 </div>
             @endif
         </div>
+        <!-- Add after Product Management section, before main closing tag -->
+<!-- Auction Management -->
+<div class="profile-section mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4>Your Auctions</h4>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAuctionModal">
+            <i class="fas fa-gavel me-2"></i>Add Auction
+        </button>
+    </div>
+
+    @if($auctions->isEmpty())
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>You haven't created any auctions yet
+        </div>
+    @else
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Image</th>
+                        <th>Item</th>
+                        <th>Starting Bid</th>
+                        <th>Current Bid</th>
+                        <th>Status</th>
+                        <th>Ends At</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($auctions as $auction)
+                        <tr>
+                            <td>
+                                <img src="{{ asset('storage/' . $auction->image) }}" 
+                                     alt="{{ $auction->name }}"
+                                     width="50"
+                                     height="50"
+                                     class="rounded">
+                            </td>
+                            <td>{{ $auction->name }}</td>
+                            <td>Rp {{ number_format($auction->starting_bid, 0, ',', '.') }}</td>
+                            <td>Rp {{ number_format($auction->current_bid ?? $auction->starting_bid, 0, ',', '.') }}</td>
+                            <td>
+                                <span class="badge bg-{{ $auction->status === 'open' ? 'success' : 'secondary' }}">
+                                    {{ $auction->status }}
+                                </span>
+                            </td>
+                            <td>
+                                @if($auction->ends_at)
+                                    {{ $auction->ends_at instanceof \Carbon\Carbon ? $auction->ends_at->format('d M Y H:i') : Carbon\Carbon::parse($auction->ends_at)->format('d M Y H:i') }}
+                                @else
+                                    N/A
+                                @endif
+                            </td>
+                            <td>
+                                <a href="{{ route('auction.show', $auction->id) }}" class="btn btn-sm btn-info">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    @endif
+</div>
+
+<!-- Add Auction Modal -->
+<div class="modal fade" id="addAuctionModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create New Auction</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{{ route('seller.auctions.store') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Item Name</label>
+                        <input type="text" name="name" class="form-control" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea name="description" class="form-control" rows="3" required></textarea>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">Starting Bid (Rp)</label>
+                                <input type="number" name="starting_bid" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">Bid Increment (Rp)</label>
+                                <input type="number" name="bid_increment" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label">Duration (hours)</label>
+                                <input type="number" name="duration" class="form-control" required min="1">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Item Image</label>
+                        <input type="file" name="image" class="form-control" accept="image/*" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Create Auction</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
     </main>
 
     <!-- Add Product Modal -->
@@ -508,7 +695,6 @@
             </div>
         </div>
     </div>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {

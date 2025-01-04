@@ -44,15 +44,15 @@
                                         <tr>
                                             <td>{{ $order->order_id }}</td>
                                             <td>{{ $order->created_at->format('d M Y H:i') }}</td>
-                                            <td>Rp {{ number_format($order->total, 0, ',', '.') }}</td>
+                                            <td>Rp {{ number_format($order->total_amount, 0, ',', '.') }}</td>
                                             <td>
-                                                <span class="badge bg-{{ $order->status_color }}">
-                                                    {{ $order->status }}
+                                                <span class="badge bg-{{ $order->status === 'completed' ? 'success' : 'warning' }}">
+                                                    {{ ucfirst($order->status) }}
                                                 </span>
                                             </td>
                                             <td>
-                                                <span class="badge bg-{{ $order->payment_status === 'paid' ? 'success' : 'warning' }}">
-                                                    {{ $order->payment_status ?? 'pending' }}
+                                                <span class="badge bg-{{ $order->payment_status === 'success' ? 'success' : 'warning' }}">
+                                                    {{ ucfirst($order->payment_status) }}
                                                 </span>
                                             </td>
                                             <td>
@@ -63,50 +63,6 @@
                                                 </button>
                                             </td>
                                         </tr>
-
-                                        <!-- Order Details Modal -->
-                                        <div class="modal fade" id="orderModal{{ $order->id }}" tabindex="-1">
-                                            <div class="modal-dialog modal-lg">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title">Order Details #{{ $order->order_id }}</h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <div class="mb-3">
-                                                            <strong>Order Date:</strong> {{ $order->created_at->format('d M Y H:i') }}<br>
-                                                            <strong>Status:</strong> 
-                                                            <span class="badge bg-{{ $order->status_color }}">{{ $order->status }}</span><br>
-                                                            <strong>Total Amount:</strong> Rp {{ number_format($order->total, 0, ',', '.') }}
-                                                        </div>
-                                                        <hr>
-                                                        <h6>Items Ordered</h6>
-                                                        <div class="table-responsive">
-                                                            <table class="table">
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th>Product</th>
-                                                                        <th>Quantity</th>
-                                                                        <th>Price</th>
-                                                                        <th>Subtotal</th>
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                    @foreach($order->orderItems as $item)
-                                                                    <tr>
-                                                                        <td>{{ $item->product->name }}</td>
-                                                                        <td>{{ $item->quantity }}</td>
-                                                                        <td>Rp {{ number_format($item->price, 0, ',', '.') }}</td>
-                                                                        <td>Rp {{ number_format($item->price * $item->quantity, 0, ',', '.') }}</td>
-                                                                    </tr>
-                                                                    @endforeach
-                                                                </tbody>
-                                                            </table>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
                                         @endforeach
                                     </tbody>
                                 </table>
@@ -117,6 +73,68 @@
             </div>
         </div>
     </div>
+
+    <!-- Modals section - moved outside the main container -->
+    @foreach($orders as $order)
+    <div class="modal fade" id="orderModal{{ $order->id }}" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Order Details #{{ $order->order_id }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <strong>Order Date:</strong> {{ $order->created_at->format('d M Y H:i') }}<br>
+                        <strong>Status:</strong> 
+                        <span class="badge bg-{{ $order->status === 'completed' ? 'success' : 'warning' }}">
+                            {{ ucfirst($order->status) }}
+                        </span><br>
+                        <strong>Payment Status:</strong>
+                        <span class="badge bg-{{ $order->payment_status === 'success' ? 'success' : 'warning' }}">
+                            {{ ucfirst($order->payment_status) }}
+                        </span><br>
+                        <strong>Total Amount:</strong> Rp {{ number_format($order->total_amount, 0, ',', '.') }}
+                    </div>
+                    <hr>
+                    <h6>Items Ordered</h6>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Quantity</th>
+                                    <th>Price</th>
+                                    <th>Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($order->orderItems as $item)
+                                <tr>
+                                    <td>{{ $item->product->name ?? 'Product Not Found' }}</td>
+                                    <td>{{ $item->quantity }}</td>
+                                    <td>Rp {{ number_format($item->price, 0, ',', '.') }}</td>
+                                    <td>Rp {{ number_format($item->price * $item->quantity, 0, ',', '.') }}</td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="4" class="text-center">No items found for this order</td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                                    <td><strong>Rp {{ number_format($order->total_amount, 0, ',', '.') }}</strong></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endforeach
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>

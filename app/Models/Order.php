@@ -1,39 +1,30 @@
 <?php
-// app/Models/Order.php
 
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Order extends Model
 {
-    use HasFactory;
+    protected $with = ['orderItems.product']; // Always load relationships
 
     protected $fillable = [
         'user_id',
         'order_id',
-        'total',
+        'total_amount',
+        'shipping_address',
+        'payment_method',
         'status',
+        'payment_status'
     ];
-
-    public function getStatusColorAttribute()
-    {
-        return [
-            'pending' => 'warning',
-            'processing' => 'info',
-            'completed' => 'success',
-            'cancelled' => 'danger',
-        ][$this->status] ?? 'secondary';
-    }
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
 
     public function orderItems()
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function products()
+    {
+        return $this->hasManyThrough(Product::class, OrderItem::class);
     }
 }

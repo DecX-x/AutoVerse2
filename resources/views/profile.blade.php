@@ -330,7 +330,7 @@
                         <a class="nav-link" href="/categories">Categories</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Auction💰</a>
+                        <a class="nav-link" href="/auctions">Auction💰</a>
                     </li>
                 </ul>
     
@@ -438,7 +438,7 @@
                 <div class="profile-section">
                     <h5 class="mb-3">Quick Links</h5>
                     <div class="list-group">
-                        <a href="#" class="list-group-item list-group-item-action">
+                        <a href="/orders" class="list-group-item list-group-item-action">
                             <i class="fas fa-shopping-bag me-2"></i>My Orders
                         </a>
                         <a href="/cart" class="list-group-item list-group-item-action">
@@ -452,12 +452,46 @@
             </div>
             
             <div class="col-md-9">
-                <div class="profile-section">
-                    <h5 class="mb-4">Recent Orders</h5>
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle me-2"></i>No recent orders found
-                    </div>
-                </div>
+                <!-- Replace the Recent Orders section -->
+<div class="profile-section">
+    <h5 class="mb-4">Recent Orders</h5>
+    @if($recentOrders->isEmpty())
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>No recent orders found
+        </div>
+    @else
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Date</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($recentOrders as $order)
+                    <tr>
+                        <td>
+                            <a href="{{ route('orders.show', $order->id) }}" class="text-primary">
+                                #{{ $order->order_id }}
+                            </a>
+                        </td>
+                        <td>{{ $order->created_at->format('d M Y') }}</td>
+                        <td>Rp {{ number_format($order->total_amount, 0, ',', '.') }}</td>
+                        <td>
+                            <span class="badge bg-{{ $order->status === 'completed' ? 'success' : 'warning' }}">
+                                {{ ucfirst($order->status) }}
+                            </span>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    @endif
+</div>
                 
                 <div class="profile-section">
                     <h5 class="mb-4">Saved Addresses</h5>
@@ -476,6 +510,59 @@
                     <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addAddressModal">
                         <i class="fas fa-plus me-2"></i>Add New Address
                     </button>
+                </div>
+                <!-- Add after Saved Addresses section -->
+                <div class="profile-section">
+                    <h5 class="mb-4">My Auction Bids</h5>
+                    @if($recentBids->isEmpty())
+                        <div class="alert alert-info">
+                            <i class="fas fa-gavel me-2"></i>You haven't placed any bids yet
+                        </div>
+                    @else
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Auction Item</th>
+                                        <th>Your Bid</th>
+                                        <th>Bid Date</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($recentBids as $bid)
+                                    <tr>
+                                        <td>{{ $bid->auctionItem->title }}</td>
+                                        <td>Rp {{ number_format($bid->bid_amount, 0, ',', '.') }}</td>
+                                        <td>{{ $bid->created_at->format('d M Y H:i') }}</td>
+                                        <td>
+                                            @php
+                                                $now = \Carbon\Carbon::now();
+                                                $auctionEndsAt = \Carbon\Carbon::parse($bid->auctionItem->ends_at);
+                                            @endphp
+                                            
+                                            @if($bid->is_winner)
+                                                <span class="badge bg-success">Winner</span>
+                                                <a href="{{ route('auctions.show', $bid->auction_item_id) }}" 
+                                                   class="btn btn-sm btn-outline-success ms-2">
+                                                    <i class="fas fa-trophy"></i> View Win
+                                                </a>
+                                            @elseif($auctionEndsAt < $now)
+                                                <span class="badge bg-secondary">Ended</span>
+                                            @else
+                                                <span class="badge bg-primary">Active</span>
+                                                <a href="{{ route('auctions.show', $bid->auction_item_id) }}" 
+                                                   class="btn btn-sm btn-outline-primary ms-2">
+                                                    <i class="fas fa-eye"></i> View
+                                                </a>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>

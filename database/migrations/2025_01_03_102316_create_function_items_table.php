@@ -16,12 +16,13 @@ class CreateFunctionItemsTable extends Migration
             $table->string('name');
             $table->string('image')->nullable();
             $table->text('description');
-            $table->decimal('starting_bid', 10, 2);
-            $table->decimal('current_bid', 10, 2)->nullable();
-            $table->decimal('bid_increment', 10, 2);
+            $table->decimal('starting_bid', 20, 2);
+            $table->decimal('current_bid', 20, 2)->nullable();
+            $table->decimal('bid_increment', 20, 2);
             $table->timestamp('starts_at');
             $table->timestamp('ends_at');
             $table->enum('status', ['open', 'closed'])->default('open');
+            $table->foreignId('seller_id')->nullable()->constrained();
             $table->timestamps();
         });
     }

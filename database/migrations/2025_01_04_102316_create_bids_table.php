@@ -8,17 +8,18 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::create('sellers', function (Blueprint $table) {
+        Schema::create('auction_bids', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('auction_item_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->decimal('total_revenue', 30, 2)->default(0);
-            $table->integer('total_products_sold')->default(0);
+            $table->decimal('bid_amount', 20, 2);
+            $table->boolean('is_winner')->default(false);
             $table->timestamps();
         });
     }
 
     public function down()
     {
-        Schema::dropIfExists('sellers');
+        Schema::dropIfExists('bids');
     }
 };

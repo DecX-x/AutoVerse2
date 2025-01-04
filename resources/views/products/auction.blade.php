@@ -32,7 +32,7 @@
                 @forelse($auction_items as $item)
                     <div class="col-md-4">
                         <div class="card h-100">
-                            <img src="{{ asset($item->image) }}" class="card-img-top" alt="{{ $item->product_name }}">
+                            <img src="{{ asset('storage/' . $item->image) }}" class="img-fluid rounded shadow" alt="{{ $item->name }}">
                             <div class="card-body">
                                 <h5 class="card-title">{{ $item->name }}</h5>
                                 <p class="text-muted">{{ Str::limit($item->description, 100) }}</p>

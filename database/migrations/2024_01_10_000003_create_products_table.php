@@ -12,8 +12,8 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('category');
-            $table->decimal('price', 12, 2);
-            $table->decimal('discount_price', 12, 2)->nullable();
+            $table->decimal('price', 30, 2);
+            $table->decimal('discount_price', 30, 2)->nullable();
             $table->float('rating')->default(0);
             $table->integer('reviews_count')->default(0);
             $table->text('description');

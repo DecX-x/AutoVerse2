@@ -338,7 +338,7 @@
                         <a class="nav-link" href="/categories">Categories</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Auction💰</a>
+                        <a class="nav-link" href="/auctions">Auction💰</a>
                     </li>
                 </ul>
     

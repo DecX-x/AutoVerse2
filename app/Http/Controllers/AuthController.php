@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use App\Models\Order;
+use App\Models\AuctionItem;
 
 class AuthController extends Controller
 {
@@ -14,6 +16,10 @@ class AuthController extends Controller
     {
         return view('auth.login');
     }
+    public function orders()
+{
+    return $this->hasMany(Order::class);
+}
 
     public function authenticate(Request $request)
     {
@@ -65,9 +71,26 @@ class AuthController extends Controller
 
     
     public function profile()
-    {
-        return view('profile');
-    }
+{
+    $user = Auth::user();
+    $recentOrders = $user->orders()
+        ->orderBy('created_at', 'desc')
+        ->take(5)
+        ->get();
+
+    // Add this section to fetch bids
+    $recentBids = \App\Models\AuctionBid::where('user_id', $user->id)
+        ->with('auctionItem')  // Eager load auction item details
+        ->orderBy('created_at', 'desc')
+        ->take(5)
+        ->get();
+
+    return view('profile', compact('recentOrders', 'recentBids'));
+}
+    public function show(AuctionItem $auction)
+{
+    return view('auctions.show', compact('auction'));
+}
     
     public function updateProfile(Request $request)
     {
