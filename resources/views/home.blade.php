@@ -20,7 +20,8 @@
         <section class="py-5 text-center fade-in">
             <h1 class="display-4 fw-bold mb-4">
                 @php
-                    $hour = date('H');
+                    date_default_timezone_set('Asia/Jakarta');
+                    $hour = date("H");
                     $greeting = '';
                     if ($hour >= 5 && $hour < 12) {
                         $greeting = 'Good Morning';
@@ -32,7 +33,7 @@
                         $greeting = 'Good Night';
                     }
                 @endphp
-                {{ $greeting }}
+                {{ $greeting; }}
                 @auth
                     , {{ Auth::user()->name }}
                 @endauth
