@@ -7,7 +7,8 @@
     <title>AutoVerse - Register</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ asset('css/register.css') }}">
+    <link rel="stylesheet" href="{{ asset('storage/css/register.css') }}">
+    <link href="{{ asset('css/register.css') }}" rel="stylesheet">
 </head>
 <body>
     <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">

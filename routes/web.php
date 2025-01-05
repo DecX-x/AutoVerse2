@@ -26,6 +26,11 @@ Route::get('/assets/images/{path}', function($path) {
     return response()->file($fullPath);
 })->where('path', '.*');
 
+Route::get('/assets/css/{path}', function ($path) {
+    $fullPath = public_path('storage/app/public/assets/css/' . $path);
+    return response()->file($fullPath);
+})->where('path', '.*');
+
 Route::get('/storage/{path}', function($path) {
     return response()->file(storage_path('app/public/' . $path));
 })->where('path', '.*');
